@@ -15,9 +15,3 @@ python-dotenv>=1.0.0
 matplotlib>=3.8.0
 openpyxl>=3.1.0
 
-# Optional Foot-Traffic Popular Times Scraping / Live API:
-# Note: 'populartimes' upstream git repository (m-wrzg/populartimes) can be installed via:
-# pip install git+https://github.com/m-wrzg/populartimes.git
-# The engine natively implements the Footfall Proxy Score (FPS = user_ratings_total * log10(rating + 1))
-# and weekly visitation curve synthesis with zero external scraping breaks.
-populartimes @ git+https://github.com/m-wrzg/populartimes.git; python_version < "3.13"
