@@ -59,12 +59,13 @@ def generate_ice_cream_master_workbook():
     ws_strat["B3"].font = Font(name="Calibri", size=10, italic=True, color="64748B")
 
     strategy_sections = [
-        ("Core Business Opportunity", "Current Chennai ice cream parlours charge ₹250 - ₹500 for heavy scoops and slow weigh-and-pay formats (Ibaco/Amadora). A dedicated modern softy / soft-serve parlour selling silky, high-quality, pure dairy softy at ₹60 - ₹120 served in 20 seconds solves the exact pain points of price, wait times, and rapid melting."),
-        ("Top 5 Recommended Locations", "#1 Besant Nagar Beach (massive beach stroll dessert crowd) | #2 Anna Nagar Shanthi Colony (Chennai's top post-dinner dessert walking street) | #3 Pondy Bazaar T. Nagar (85k daily pedestrian shoppers) | #4 OMR Perungudi (young tech workforce) | #5 Velachery 100 Ft Bypass (dense youth/families)."),
-        ("Optimal Pricing Sweet Spot", "Classic Swirl Cone: ₹60 - ₹80 | Gourmet Sundae Softy (with warm chocolate fudge / fruit crunch): ₹100 - ₹130 | Kids Mini-Cone: ₹40. Delivers 72% - 78% gross margin with instant volume turnaround."),
-        ("Key Vulnerabilities of Rivals", "1. Exorbitant weigh-and-pay pricing (customers feel cheated at checkout) | 2. 15-20 min billing delays on weekends | 3. Rapid melting in Chennai's humid 34°C climate | 4. Severe vehicle parking bottlenecks on main roads."),
-        ("The Winning Softy Formula", "Pure Cow Milk dairy base (no vegetable fats) + Japanese/Italian style high-overrun soft-serve + crisp waffle cones with drip-guard paper collars + 2 signature weekly rotating exotic flavors (e.g. Belgian Chocolate, Tender Coconut, Alfonso Mango, Matcha/Salted Caramel)."),
-        ("Operational Advantage", "A soft-serve machine dispenses a finished product in 15 seconds with zero scooping fatigue, zero inventory shrinkage, and requires only 80 - 150 sq.ft of retail footprint, saving 60% on commercial rental costs.")
+        ("Franchise Brand & Model", "'Softie' — Scalable Micro-Kiosk & Express Parlour Franchise Model built for high-footfall pedestrian promenades across Chennai."),
+        ("Product USP: 100% Pure Milk", "Crafted exclusively with fresh whole dairy milk (no hydrogenated vegetable palm fat or cheap watery premix). Rich, velvety mouthfeel with natural milk solids and rapid clean dissolve."),
+        ("Value Pricing: ₹20 to ₹90", "Core entry rate starts at ₹20 (Pure Milk Softie Cone for mass adoption), mid-tier swirls/dips at ₹35 - ₹60, and maximum cost capped at ₹90 (Gourmet Belgian Waffle Cone & Lotus Biscoff Sundae)."),
+        ("Daily Sales Target", "Target Average: ₹15,000 / Day (₹4,50,000 / Month per kiosk) with ~380 - 430 cones/day. Delivers 74% - 76% gross margin and ~₹2,07,500 monthly net profit (46% net margin)."),
+        ("Top 5 Recommended Locations", "#1 Besant Nagar Beach (massive beach stroll dessert crowd) | #2 Pondy Bazaar T. Nagar (85k daily pedestrian shoppers) | #3 Marina Beach Promenade (heavy outdoor snacking) | #4 Anna Nagar 2nd Avenue (Chennai's top dessert street) | #5 Sowcarpet Chaat Lane (cooling sweet relief)."),
+        ("Fast 12-Second Dispensing", "Gravity-fed softy dispensing in 12 seconds flat. 6x faster throughput than scoop parlours, clearing 15-person queues in under 3 minutes with zero scooping fatigue."),
+        ("Capital Recovery & Capex", "Total kiosk setup capex: ₹6.5 - 7.5 Lakhs (commercial 3-lever machine, refrigeration, kiosk counter). Capital payback period achieved in just 3.2 to 3.8 months.")
     ]
 
     r_idx = 5

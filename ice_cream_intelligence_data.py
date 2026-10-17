@@ -682,7 +682,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Ibaco on GN Chetty Rd, local fruit juice stalls, Keventers; zero dedicated fast-serve artisanal softy kiosk)",
         "why_softy_fits_perfectly": "Shoppers walk for 2-3 hours carrying bags under Chennai's humid evening heat. They refuse to sit down in a 45-minute cafe or wait in Ibaco's weigh-and-pay queue. An express softy window dispensing cold, silky soft-serve in 15 seconds at ₹60-₹90 is the ultimate impulse walk-and-shop snack.",
         "recommended_hero_flavors": "Belgian Chocolate Dip, Madagascar Vanilla Swirl, Salted Caramel Crunch",
-        "target_price_point": "₹60 - ₹100",
+        "target_price_point": "₹20 - ₹85",
         "estimated_monthly_cones": "22,000 - 28,000 cones/month"
     },
     {
@@ -699,7 +699,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Coaster Cafe, Pupil, few gelato counters; no modern high-throughput soft-serve bar with anti-drip cones)",
         "why_softy_fits_perfectly": "The sea breeze and humid seaside air trigger non-stop dessert cravings. Hard scoops melt in 2 minutes into soup. A softy served in a fluted waffle cone with a patented drip-guard collar enables beach walkers to stroll without sticky hands.",
         "recommended_hero_flavors": "Sea Salt Butterscotch, Dark Cocoa Dip, Mango Passion Swirl",
-        "target_price_point": "₹80 - ₹130",
+        "target_price_point": "₹20 - ₹90",
         "estimated_monthly_cones": "24,000 - 32,000 cones/month"
     },
     {
@@ -716,7 +716,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "High (Cream Stone, Amadora, Haagen-Dazs, Naturals all within 400m - but all charge ₹250-₹450/serving)",
         "why_softy_fits_perfectly": "KNK shoppers spend ₹3,000+ on apparel and dinners. After a heavy meal at Mamagoto or Bombay Brasserie, they want an aesthetic, light dessert. An ultra-premium Japanese-style Hokkaido milk soft-serve with Valrhona chocolate dip at ₹120-₹160 offers accessible luxury that looks stunning on Instagram.",
         "recommended_hero_flavors": "Japanese Matcha Green Tea, Pure Hokkaido Milk, 70% Single-Origin Cocoa",
-        "target_price_point": "₹120 - ₹160",
+        "target_price_point": "₹30 - ₹90",
         "estimated_monthly_cones": "16,000 - 20,000 cones/month"
     },
     {
@@ -733,7 +733,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "High (Cream Stone, Naturals, Corner House; all suffer 20-30 min queues on weekends)",
         "why_softy_fits_perfectly": "Anna Nagar has Chennai's highest evening dessert consumption. The existing parlours have frustrating 25-minute wait times and severe car parking bottlenecks. A street-front express softy kiosk captures the massive spillover queue with 15-second order-to-hand turnaround.",
         "recommended_hero_flavors": "Alphonso Mango Swirl, Nutella Crunch Softy, Tender Coconut Dip",
-        "target_price_point": "₹70 - ₹110",
+        "target_price_point": "₹20 - ₹90",
         "estimated_monthly_cones": "22,000 - 30,000 cones/month"
     },
     {
@@ -750,7 +750,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Low (Lots of traditional sweets and badam milk, but zero modern gourmet soft-serve parlours)",
         "why_softy_fits_perfectly": "Mint Street is world-famous for scorching spicy street snacks (murukku sandwiches, fiery kachoris, mirchi bajji). After burning their palate with spicy street food, thousands of walkers actively look for immediate cold sweet relief. A 100% vegetarian, pure cow milk softy (Kesar Pista or Rose Cardamom swirl) is an immediate hit.",
         "recommended_hero_flavors": "Kesar Pista Royal Swirl, Gulab Jamun Sundae Softy, Thandai Crunch",
-        "target_price_point": "₹60 - ₹90",
+        "target_price_point": "₹20 - ₹75",
         "estimated_monthly_cones": "25,000 - 35,000 cones/month"
     },
     {
@@ -767,7 +767,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Local juice shops, old ice cream stalls; no premium quality affordable softy brand)",
         "why_softy_fits_perfectly": "Shoppers walk for hours between textile showrooms and footwear stores. Parents carrying tired kids are eager to buy a quick, mess-free ₹50-₹70 softy cone to keep children happy. High volume, rapid turnover, low rental footprint requirement.",
         "recommended_hero_flavors": "Choco Dip Soft-Serve, Butterscotch Crisp, Strawberry Ripple",
-        "target_price_point": "₹50 - ₹80",
+        "target_price_point": "₹20 - ₹70",
         "estimated_monthly_cones": "20,000 - 26,000 cones/month"
     },
     {
@@ -784,7 +784,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Low (Traditional tiffin houses like Rayar's Mess and Jannal Kadai dominate; zero modern softy counters)",
         "why_softy_fits_perfectly": "Mylapore is deeply committed to pure vegetarian dairy quality (famous for its filter coffee culture). A pure vegetarian, preservative-free softy featuring Authentic Kumbakonam Filter Coffee Swirl and Tender Coconut Elaneer Soft-Serve will resonate strongly with local cultural values.",
         "recommended_hero_flavors": "Authentic Filter Coffee Softy, Pure Elaneer (Tender Coconut), Rose Milk Swirl",
-        "target_price_point": "₹60 - ₹95",
+        "target_price_point": "₹20 - ₹80",
         "estimated_monthly_cones": "18,000 - 24,000 cones/month"
     },
     {
@@ -801,7 +801,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Street carts and Saravana Bhavan bakery; no clean, high-speed softy brand)",
         "why_softy_fits_perfectly": "Physical exhaustion and heat are constant for shoppers walking Usman Road. A 100 sq.ft micro-counter dispensing ice-cold chocolate and vanilla softy cones right at the street entrance provides immediate refreshment with zero seating overhead.",
         "recommended_hero_flavors": "Classic Vanilla-Choco Twist, Mango Mania, Roasted Almond Crunch",
-        "target_price_point": "₹50 - ₹80",
+        "target_price_point": "₹20 - ₹70",
         "estimated_monthly_cones": "28,000 - 38,000 cones/month"
     },
     {
@@ -818,7 +818,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Mall food court desserts charge ₹300-₹450; street has Corner House & Ibaco with queues)",
         "why_softy_fits_perfectly": "Velachery diners want quick quality without paying ₹150 for mall parking or ₹400 for a Haagen-Dazs scoop. A street-front softy parlour with easy two-wheeler parking and ₹80 gourmet softy sundae cups fulfills demand for affordable luxury.",
         "recommended_hero_flavors": "Brownie Fudge Softy Sundae, Salted Biscoff Swirl, Triple Berry Blast",
-        "target_price_point": "₹80 - ₹120",
+        "target_price_point": "₹20 - ₹90",
         "estimated_monthly_cones": "20,000 - 26,000 cones/month"
     },
     {
@@ -835,7 +835,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Low (Dominated by old tea stalls, sugarcane juice vendors, and traditional halwa shops)",
         "why_softy_fits_perfectly": "Traders and commuters battle coastal heat and diesel fumes all day. A brightly-lit, hygienic softy kiosk at the Metro/railway junction provides a quick, delicious treat on the journey home. High volume, fast cash flow.",
         "recommended_hero_flavors": "Cold Kulfi Soft-Serve, Chocolate Dip Cone, Fresh Pineapple Swirl",
-        "target_price_point": "₹50 - ₹75",
+        "target_price_point": "₹20 - ₹65",
         "estimated_monthly_cones": "22,000 - 28,000 cones/month"
     },
     {
@@ -852,7 +852,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Very Low (Only street tea and samosa stalls; zero dessert parlours inside the gadget lanes)",
         "why_softy_fits_perfectly": "Ritchie Street is a dense labyrinth where thousands of young men haggle for computer parts and electronics. A high-energy, caffeine-infused 'Cold Coffee Affogato Softy' or 'Energy Chocolate Softy' at ₹50-₹70 gives shoppers an instant recharge.",
         "recommended_hero_flavors": "Espresso Affogato Softy, Choco Brownie Crumble, Dark Mocha Twist",
-        "target_price_point": "₹50 - ₹80",
+        "target_price_point": "₹20 - ₹70",
         "estimated_monthly_cones": "19,000 - 25,000 cones/month"
     },
     {
@@ -869,7 +869,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Low (Famous for biryani and sweets, but lacking modern soft-serve outlets)",
         "why_softy_fits_perfectly": "Triplicane is Chennai's late-night food capital. After heavy biryani meals at Sukku Bhai or Charminar, thousands of diners roam the streets seeking cold desserts. Operating till 1:00 AM with a Royal Falooda Softy Cone ensures steady footfall.",
         "recommended_hero_flavors": "Royal Falooda Softy, Pistachio Shahi Kulfi, Belgian Dark Chocolate",
-        "target_price_point": "₹60 - ₹95",
+        "target_price_point": "₹20 - ₹80",
         "estimated_monthly_cones": "21,000 - 27,000 cones/month"
     },
     {
@@ -886,7 +886,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Hundreds of unbranded mobile ice candy carts; zero branded hygienic dairy softy outlets)",
         "why_softy_fits_perfectly": "Parents constantly worry about food safety and hygienic water when buying beach ice creams for children. A modern, glass-fronted, UV-sanitized softy brand with pure pasteurized milk will win parents' trust and capture high volumes.",
         "recommended_hero_flavors": "Classic Dairy Milk Vanilla, Fresh Mango Twist, Rainbow Sprinkle Cone",
-        "target_price_point": "₹40 - ₹70",
+        "target_price_point": "₹20 - ₹60",
         "estimated_monthly_cones": "28,000 - 40,000 cones/month"
     },
     {
@@ -903,7 +903,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Low (Boutique cafes like Beachville nearby; no dedicated artisanal softy shop)",
         "why_softy_fits_perfectly": "Valmiki Nagar evening walkers appreciate clean-label, artisanal foods. A boutique softy counter offering pure A2 Jersey cow milk soft-serve, natural honey lavender, and single-origin dark chocolate dips aligns with this high-paying demographic.",
         "recommended_hero_flavors": "Madagascar Vanilla & Wildflower Honey, Single-Origin Dark Choco Dip, Vegan Berry Sorbet Swirl",
-        "target_price_point": "₹100 - ₹150",
+        "target_price_point": "₹20 - ₹90",
         "estimated_monthly_cones": "14,000 - 18,000 cones/month"
     },
     {
@@ -920,7 +920,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Mall food court outlets charge ₹250+; outside has local bakeries with poor softy machines)",
         "why_softy_fits_perfectly": "Combines traditional temple pilgrims (who love pure milk sweets) with cinema and mall youth (who love trendy desserts). A dual-concept softy counter offering Traditional Kulfi Soft-Serve on one nozzle and Dark Chocolate Brownie on the other appeals to both groups.",
         "recommended_hero_flavors": "Kulfi Malai Swirl, Choco Dip Cone, Strawberry Sundae",
-        "target_price_point": "₹60 - ₹95",
+        "target_price_point": "₹20 - ₹80",
         "estimated_monthly_cones": "20,000 - 26,000 cones/month"
     },
     {
@@ -937,7 +937,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Low (Severely underserved by modern dessert brands; residents travel to Anna Nagar for ice cream)",
         "why_softy_fits_perfectly": "North Chennai has massive disposable income that is ignored by premium brands. Launching a vibrant, neon-lit, clean softy parlour on Paper Mills Road provides residents an aspirational neighborhood dessert spot without crossing into Anna Nagar.",
         "recommended_hero_flavors": "Triple Chocolate Softy, Butterscotch Bliss, Mango Swirl",
-        "target_price_point": "₹50 - ₹85",
+        "target_price_point": "₹20 - ₹70",
         "estimated_monthly_cones": "19,000 - 25,000 cones/month"
     },
     {
@@ -954,7 +954,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Several bubble tea and waffle counters; lacks a high-speed artisanal softy bar)",
         "why_softy_fits_perfectly": "Techies work under AC fatigue and need a quick sensory pick-me-up during team breaks or after dinner. An Affogato Softy (espresso shot over vanilla soft-serve) and Biscoff dessert cups deliver high-margin sales with midnight delivery potential.",
         "recommended_hero_flavors": "Caffeine Kick Affogato Softy, Lotus Biscoff Dream, Dark Belgian Dip",
-        "target_price_point": "₹80 - ₹130",
+        "target_price_point": "₹20 - ₹90",
         "estimated_monthly_cones": "18,000 - 24,000 cones/month"
     },
     {
@@ -971,7 +971,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Moderate (Local bakeries with low-grade softy; Naturals is small and far; lacks modern grab-and-go)",
         "why_softy_fits_perfectly": "Shanmugam Road is one of the highest-density commuter funnels in Tamil Nadu. Commuters switching from suburban electric trains to MTC buses walk through this market. A rapid 15-second softy dispense allows commuters to grab a sweet treat without missing their bus.",
         "recommended_hero_flavors": "Choco Dip Soft-Serve, Strawberry Swirl, Classic Vanilla Crunch",
-        "target_price_point": "₹50 - ₹75",
+        "target_price_point": "₹20 - ₹65",
         "estimated_monthly_cones": "26,000 - 36,000 cones/month"
     },
     {
@@ -988,7 +988,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Low (Ibaco exists but is too expensive for regular visits; no quality softy parlour)",
         "why_softy_fits_perfectly": "Ambattur residents are tired of low-quality bakery softies with icy vegetable fats. Providing real dairy milk soft-serve at ₹50-₹70 creates an immediate loyal customer base among local families seeking affordable weekend treats.",
         "recommended_hero_flavors": "Butterscotch Softy, Chocolate Dip Cone, Real Fruit Mango",
-        "target_price_point": "₹50 - ₹75",
+        "target_price_point": "₹20 - ₹65",
         "estimated_monthly_cones": "17,000 - 22,000 cones/month"
     },
     {
@@ -1005,7 +1005,7 @@ TOP_20_BAZAAR_SITES: List[Dict[str, Any]] = [
         "competitor_density": "Low (Boutique cafes and bakeries like Old Town Pizzeria; lacking dedicated softy counter)",
         "why_softy_fits_perfectly": "Kilpauk has high household income and discerning taste. Families walk after dinner along Kilpauk Garden Road. A charming European-style softy bar offering gourmet toppings like roasted hazelnuts, Belgian chocolate, and artisan fruit purees fits the neighborhood aesthetic.",
         "recommended_hero_flavors": "Belgian Chocolate Hazelnut Swirl, French Vanilla Bean, Wild Blueberry Softy",
-        "target_price_point": "₹90 - ₹140",
+        "target_price_point": "₹20 - ₹90",
         "estimated_monthly_cones": "15,000 - 19,000 cones/month"
     }
 ]
@@ -1231,7 +1231,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Pondy Bazaar Pedestrian Plaza",
         "zone": "Central Chennai",
         "daily_evening_footfall": "75,000 - 110,000",
-        "target_price": "₹60 - ₹100",
+        "target_price": "₹20 - ₹85",
         "est_monthly_cones": 25000,
         "fit_factor": "Highest pedestrian density in TN; shoppers seek fast walk-and-shop snacking",
         "hero_flavors": "Belgian Chocolate Dip, Madagascar Vanilla Swirl, Salted Caramel",
@@ -1246,7 +1246,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Besant Nagar Beach Promenade",
         "zone": "South Chennai",
         "daily_evening_footfall": "40,000 - 65,000",
-        "target_price": "₹80 - ₹130",
+        "target_price": "₹20 - ₹90",
         "est_monthly_cones": 28000,
         "fit_factor": "High youth demographic; coastal evening breeze; solved by anti-drip waffle cones",
         "hero_flavors": "Sea Salt Butterscotch, Dark Cocoa Dip, Mango Passion Swirl",
@@ -1261,7 +1261,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Khader Nawaz Khan (KNK) Road",
         "zone": "Central Chennai",
         "daily_evening_footfall": "25,000 - 38,000",
-        "target_price": "₹120 - ₹160",
+        "target_price": "₹30 - ₹90",
         "est_monthly_cones": 18000,
         "fit_factor": "Affluent post-dinner walkers; demand accessible aesthetic luxury (Hokkaido milk)",
         "hero_flavors": "Japanese Matcha, Pure Hokkaido Milk, 70% Single-Origin Cocoa",
@@ -1276,7 +1276,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Anna Nagar 2nd Avenue",
         "zone": "West Chennai",
         "daily_evening_footfall": "50,000 - 80,000",
-        "target_price": "₹70 - ₹110",
+        "target_price": "₹20 - ₹90",
         "est_monthly_cones": 26000,
         "fit_factor": "Highest dessert consumption hub; captures massive competitor queue spillover",
         "hero_flavors": "Alphonso Mango Swirl, Nutella Crunch Softy, Tender Coconut Dip",
@@ -1291,7 +1291,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Sowcarpet / Mint Street",
         "zone": "North Chennai",
         "daily_evening_footfall": "60,000 - 95,000",
-        "target_price": "₹60 - ₹90",
+        "target_price": "₹20 - ₹75",
         "est_monthly_cones": 30000,
         "fit_factor": "Instant sweet cooling relief after spicy chaat; pure vegetarian milk demand",
         "hero_flavors": "Kesar Pista Royal Swirl, Gulab Jamun Sundae Softy, Thandai Crunch",
@@ -1306,7 +1306,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Purasawalkam High Road",
         "zone": "North-Central Chennai",
         "daily_evening_footfall": "55,000 - 85,000",
-        "target_price": "₹50 - ₹80",
+        "target_price": "₹20 - ₹70",
         "est_monthly_cones": 23000,
         "fit_factor": "Dense family textile shopping; parents purchase quick ₹50 treats for children",
         "hero_flavors": "Choco Dip Soft-Serve, Butterscotch Crisp, Strawberry Ripple",
@@ -1321,7 +1321,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Mylapore Temple Tank Bazaar",
         "zone": "Central Chennai",
         "daily_evening_footfall": "35,000 - 55,000",
-        "target_price": "₹60 - ₹95",
+        "target_price": "₹20 - ₹80",
         "est_monthly_cones": 21000,
         "fit_factor": "Heritage cultural market; high fit for Kumbakonam Filter Coffee & Elaneer flavors",
         "hero_flavors": "Authentic Filter Coffee Softy, Pure Elaneer Soft-Serve, Rose Milk Swirl",
@@ -1336,7 +1336,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Usman Road (T. Nagar)",
         "zone": "Central Chennai",
         "daily_evening_footfall": "90,000 - 130,000",
-        "target_price": "₹50 - ₹80",
+        "target_price": "₹20 - ₹70",
         "est_monthly_cones": 33000,
         "fit_factor": "Hyper-dense gold & saree shoppers; physical fatigue creates high refreshment demand",
         "hero_flavors": "Classic Vanilla-Choco Twist, Mango Mania, Roasted Almond Crunch",
@@ -1351,7 +1351,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Velachery 100 Ft Bypass Road",
         "zone": "South Chennai",
         "daily_evening_footfall": "45,000 - 70,000",
-        "target_price": "₹80 - ₹120",
+        "target_price": "₹20 - ₹90",
         "est_monthly_cones": 23000,
         "fit_factor": "Young tech workforce & cinema crowds; avoids ₹150 mall parking fee barrier",
         "hero_flavors": "Brownie Fudge Softy Sundae, Salted Biscoff Swirl, Triple Berry Blast",
@@ -1366,7 +1366,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "George Town / NSC Bose Road",
         "zone": "North Chennai",
         "daily_evening_footfall": "70,000 - 100,000",
-        "target_price": "₹50 - ₹75",
+        "target_price": "₹20 - ₹65",
         "est_monthly_cones": 25000,
         "fit_factor": "Commuters and traders seek immediate sweet relief before boarding trains/metro",
         "hero_flavors": "Cold Kulfi Soft-Serve, Chocolate Dip Cone, Fresh Pineapple Swirl",
@@ -1381,7 +1381,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Ritchie Street Tech Bazaar",
         "zone": "Central Chennai",
         "daily_evening_footfall": "45,000 - 65,000",
-        "target_price": "₹50 - ₹80",
+        "target_price": "₹20 - ₹70",
         "est_monthly_cones": 22000,
         "fit_factor": "Young male tech shoppers walk for hours; high demand for caffeine affogato softy",
         "hero_flavors": "Espresso Affogato Softy, Choco Brownie Crumble, Dark Mocha Twist",
@@ -1396,7 +1396,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Triplicane Pycrofts Road",
         "zone": "Central Chennai",
         "daily_evening_footfall": "40,000 - 60,000",
-        "target_price": "₹60 - ₹95",
+        "target_price": "₹20 - ₹80",
         "est_monthly_cones": 24000,
         "fit_factor": "Post-biryani dessert demand active past midnight; Royal Falooda Softy fit",
         "hero_flavors": "Royal Falooda Softy, Pistachio Shahi Kulfi, Belgian Dark Chocolate",
@@ -1411,7 +1411,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Marina Beach Promenade",
         "zone": "Central-East Chennai",
         "daily_evening_footfall": "60,000 - 100,000",
-        "target_price": "₹40 - ₹70",
+        "target_price": "₹20 - ₹60",
         "est_monthly_cones": 34000,
         "fit_factor": "Epicentre of outdoor snacking; families trust branded hygienic pasteurized softy",
         "hero_flavors": "Classic Dairy Milk Vanilla, Fresh Mango Twist, Rainbow Sprinkle Cone",
@@ -1426,7 +1426,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Thiruvanmiyur Beach Walk",
         "zone": "South Chennai",
         "daily_evening_footfall": "20,000 - 35,000",
-        "target_price": "₹100 - ₹150",
+        "target_price": "₹20 - ₹90",
         "est_monthly_cones": 16000,
         "fit_factor": "Artisanal & pet-friendly strollers; high willingness to pay for A2 cow milk & honey",
         "hero_flavors": "Madagascar Vanilla & Wildflower Honey, Single-Origin Dark Choco, Berry Sorbet",
@@ -1441,7 +1441,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Vadapalani 100 Ft Road",
         "zone": "West Chennai",
         "daily_evening_footfall": "50,000 - 75,000",
-        "target_price": "₹60 - ₹95",
+        "target_price": "₹20 - ₹80",
         "est_monthly_cones": 23000,
         "fit_factor": "Dual demographic: temple pilgrims (kulfi softy) + Nexus mall youth (brownie softy)",
         "hero_flavors": "Kulfi Malai Swirl, Choco Dip Cone, Strawberry Sundae",
@@ -1456,7 +1456,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Perambur Paper Mills Road",
         "zone": "North Chennai",
         "daily_evening_footfall": "45,000 - 68,000",
-        "target_price": "₹50 - ₹85",
+        "target_price": "₹20 - ₹70",
         "est_monthly_cones": 22000,
         "fit_factor": "Underserved North Chennai market; strong neighborhood family demand",
         "hero_flavors": "Triple Chocolate Softy, Butterscotch Bliss, Mango Swirl",
@@ -1471,7 +1471,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Sholinganallur Junction (OMR)",
         "zone": "South Chennai",
         "daily_evening_footfall": "35,000 - 55,000",
-        "target_price": "₹80 - ₹130",
+        "target_price": "₹20 - ₹90",
         "est_monthly_cones": 21000,
         "fit_factor": "Tech workforce evening relaxation; high Affogato softy & late-night delivery demand",
         "hero_flavors": "Caffeine Kick Affogato Softy, Lotus Biscoff Dream, Dark Belgian Dip",
@@ -1486,7 +1486,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Tambaram West Shanmugam Rd",
         "zone": "South-West Chennai",
         "daily_evening_footfall": "85,000 - 130,000",
-        "target_price": "₹50 - ₹75",
+        "target_price": "₹20 - ₹65",
         "est_monthly_cones": 31000,
         "fit_factor": "Massive train commuter funnel; 15-second transit grab-and-go before boarding bus",
         "hero_flavors": "Choco Dip Soft-Serve, Strawberry Swirl, Classic Vanilla Crunch",
@@ -1501,7 +1501,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Ambattur OT MTH Road",
         "zone": "West Chennai",
         "daily_evening_footfall": "40,000 - 60,000",
-        "target_price": "₹50 - ₹75",
+        "target_price": "₹20 - ₹65",
         "est_monthly_cones": 19000,
         "fit_factor": "Local families eager for quality dairy softy over synthetic bakery vegetable fats",
         "hero_flavors": "Butterscotch Softy, Chocolate Dip Cone, Real Fruit Mango",
@@ -1516,7 +1516,7 @@ COMPARATIVE_EVALUATION_MATRIX: List[Dict[str, Any]] = [
         "bazaar_location": "Kilpauk Garden Road",
         "zone": "Central Chennai",
         "daily_evening_footfall": "22,000 - 35,000",
-        "target_price": "₹90 - ₹140",
+        "target_price": "₹20 - ₹90",
         "est_monthly_cones": 17000,
         "fit_factor": "High-income residential families; evening walking destination for artisanal toppings",
         "hero_flavors": "Belgian Chocolate Hazelnut Swirl, French Vanilla Bean, Wild Blueberry Softy",
