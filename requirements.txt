@@ -1,0 +1,23 @@
+# Chennai Urban Analytics Pipeline & Interactive Dashboard Dependencies
+streamlit>=1.30.0,<=1.66.0
+pydeck>=0.8.0,<=0.9.3
+folium>=0.15.0,<=0.20.0
+streamlit-folium>=0.20.0,<=0.27.4
+geopandas>=1.0.0,<=1.2.0
+shapely>=2.0.0,<=2.2.0
+h3>=4.0.0,<=4.5.0
+googlemaps>=4.10.0
+requests>=2.30.0
+altair>=5.0.0,<=6.3.0
+pandas>=2.0.0,<=3.0.6
+numpy>=1.24.0,<=2.5.4
+python-dotenv>=1.0.0
+matplotlib>=3.8.0
+openpyxl>=3.1.0
+
+# Optional Foot-Traffic Popular Times Scraping / Live API:
+# Note: 'populartimes' upstream git repository (m-wrzg/populartimes) can be installed via:
+# pip install git+https://github.com/m-wrzg/populartimes.git
+# The engine natively implements the Footfall Proxy Score (FPS = user_ratings_total * log10(rating + 1))
+# and weekly visitation curve synthesis with zero external scraping breaks.
+populartimes @ git+https://github.com/m-wrzg/populartimes.git; python_version < "3.13"

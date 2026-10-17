@@ -1,0 +1,23 @@
+# Environment variables & secrets (CRITICAL: NEVER COMMIT API KEYS)
+.env
+.env.local
+
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# OS specific files
+.DS_Store
+Thumbs.db
