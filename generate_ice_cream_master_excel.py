@@ -129,11 +129,21 @@ def generate_ice_cream_master_workbook():
 
     matrix_headers = [
         "Rank", "Bazaar Location", "Zone", "Daily Evening Footfall",
-        "Target Price Point", "Est. Monthly Cones", "Conversion Rate",
-        "Est. Monthly Revenue (₹)", "Gross Profit @ 75% Margin (₹)",
-        "Est. Commercial Rent / sq.ft", "Capital Payback Period",
+        "Cones / Day (0.7%-1.0% Conv)", "Monthly Revenue @ ₹50 (0.7%-1.0%)", "Monthly Gross Profit @ 75%",
+        "Softie Target Price", "Est. Commercial Rent / sq.ft", "Capital Payback Period",
         "Product-Market Fit Factor", "Hero Flavors & Signature Swirls"
     ]
+
+    import re
+    def compute_insight(footfall_str, avg_price=50.0):
+        nums = [int(n.replace(",", "")) for n in re.findall(r"\d[\d,]*", str(footfall_str))]
+        low_f, high_f = (nums[0], nums[1]) if len(nums) >= 2 else (nums[0], nums[0]) if nums else (40000, 65000)
+        c_low, c_high = int(low_f * 0.007), int(high_f * 0.010)
+        r_low, r_high = c_low * avg_price * 30, c_high * avg_price * 30
+        gp_low, gp_high = int(r_low * 0.75), int(r_high * 0.75)
+        return (f"{c_low:,} - {c_high:,} cones/day",
+                f"₹{r_low/100000:.2f} L - ₹{r_high/100000:.2f} L",
+                f"₹{gp_low/100000:.2f} L - ₹{gp_high/100000:.2f} L")
 
     matrix_header_fill = PatternFill(start_color="047857", end_color="047857", fill_type="solid") # Emerald Green
     for c_idx, h_text in enumerate(matrix_headers, 1):
@@ -143,33 +153,34 @@ def generate_ice_cream_master_workbook():
         cell.alignment = center_align
 
     for r_idx, m in enumerate(COMPARATIVE_EVALUATION_MATRIX, 2):
+        c_range, r_range, gp_range = compute_insight(m["daily_evening_footfall"], avg_price=50.0)
+
         ws_matrix.cell(row=r_idx, column=1, value=m["rank"]).alignment = center_align
         ws_matrix.cell(row=r_idx, column=2, value=m["bazaar_location"]).font = bold_font
         ws_matrix.cell(row=r_idx, column=3, value=m["zone"]).alignment = center_align
         ws_matrix.cell(row=r_idx, column=4, value=m["daily_evening_footfall"]).alignment = center_align
-        ws_matrix.cell(row=r_idx, column=5, value=m["target_price"]).alignment = center_align
-        ws_matrix.cell(row=r_idx, column=6, value=f"{m['est_monthly_cones']:,}").alignment = center_align
-        ws_matrix.cell(row=r_idx, column=7, value=m["conversion_rate"]).alignment = center_align
+        ws_matrix.cell(row=r_idx, column=5, value=c_range).alignment = center_align
         
-        # Financials
-        c_rev = ws_matrix.cell(row=r_idx, column=8, value=m["est_monthly_revenue"])
+        # Financials from 0.7% - 1.0% footfall conversion @ ₹50
+        c_rev = ws_matrix.cell(row=r_idx, column=6, value=r_range)
         c_rev.alignment = center_align
         c_rev.font = bold_font
         
-        c_profit = ws_matrix.cell(row=r_idx, column=9, value=m["gross_profit_75pct"])
+        c_profit = ws_matrix.cell(row=r_idx, column=7, value=gp_range)
         c_profit.alignment = center_align
         c_profit.fill = soft_green_fill
         c_profit.font = Font(name="Calibri", size=10, bold=True, color="065F46")
 
-        ws_matrix.cell(row=r_idx, column=10, value=m["rental_sqft_estimate"]).alignment = center_align
-        ws_matrix.cell(row=r_idx, column=11, value=m["payback_period_months"]).alignment = center_align
+        ws_matrix.cell(row=r_idx, column=8, value=m["target_price"]).alignment = center_align
+        ws_matrix.cell(row=r_idx, column=9, value=m["rental_sqft_estimate"]).alignment = center_align
+        ws_matrix.cell(row=r_idx, column=10, value=m["payback_period_months"]).alignment = center_align
         
-        c_fit = ws_matrix.cell(row=r_idx, column=12, value=m["fit_factor"])
+        c_fit = ws_matrix.cell(row=r_idx, column=11, value=m["fit_factor"])
         c_fit.alignment = left_align
         
-        ws_matrix.cell(row=r_idx, column=13, value=m["hero_flavors"])
+        ws_matrix.cell(row=r_idx, column=12, value=m["hero_flavors"])
 
-        for col in range(1, 14):
+        for col in range(1, 13):
             ws_matrix.cell(row=r_idx, column=col).border = border_thin
 
     # -------------------------------------------------------------

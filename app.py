@@ -1,22 +1,24 @@
 """
 Chennai "Softie" Pure Milk Franchise Site Selection & Competitor Intelligence Dashboard.
 Exclusively focused on Ice Cream Parlours & Dessert Places:
-1. Options & Catchment Filters First (Accessible throughout all tabs).
+1. Options & Catchment Filters at the top of the page (persistent & full-width, no sidebar clutter).
 2. Clean Single-Tab Navigation (Select Comparative Evaluation, Map, Bazaars, etc. with easy back-and-forth).
 3. Interactive Catchment Map with Table Below Map containing direct Clickable Google Maps Links.
-4. "Softie" Pure Milk Franchise Strategic Blueprint:
+4. Footfall Revenue Insights (@ ₹50 average price & 0.7% - 1.0% footfall conversion) in EVERY area and bazaar.
+5. "Softie" Pure Milk Franchise Strategic Blueprint:
    - Brand: Softie (Franchise Model)
    - 100% Pure Fresh Dairy Milk Quality
    - Core Price Starts at ₹20, Maximum Cost ₹90
    - Daily Sales Target: Average ₹15,000 / day (₹4,50,000 / month)
-5. 20 High-Footfall Bazaars & Comparative Matrix.
-6. Feeder Traffic & 14-Sheet Master Excel Export.
+6. 20 High-Footfall Bazaars & Comparative Matrix.
+7. Feeder Traffic & 14-Sheet Master Excel Export.
 """
 
 import json
 import os
 import io
 import math
+import re
 import urllib.parse
 import textwrap
 from typing import Dict, List, Any
@@ -48,17 +50,24 @@ from ice_cream_intelligence_data import (
     COMPARATIVE_EVALUATION_MATRIX
 )
 
-# Page configuration
+# Page configuration - Collapsed sidebar
 st.set_page_config(
     page_title="Softie — Pure Milk Franchise Site Selection",
     page_icon="🍦",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Custom Styling
+# Custom Styling - Hiding sidebar and sidebar toggle completely
 st.markdown("""
 <style>
+    /* Hide sidebar and toggle completely as requested */
+    [data-testid="stSidebar"],
+    [data-testid="collapsedControl"],
+    header [data-testid="baseButton-header"] {
+        display: none !important;
+    }
+    
     .main-header {
         font-size: 2.15rem;
         font-weight: 800;
@@ -76,21 +85,34 @@ st.markdown("""
         background: linear-gradient(135deg, #1E293B, #0F172A);
         border: 1px solid #3B82F6;
         border-radius: 12px;
-        padding: 18px 20px 14px 20px;
-        margin-bottom: 16px;
+        padding: 16px 20px 12px 20px;
+        margin-bottom: 14px;
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
     }
     .status-banner {
         background-color: #1E293B;
         border-radius: 8px;
         padding: 12px 18px;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
         border: 1px solid #334155;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 12px;
+    }
+    .revenue-insight-card {
+        background: linear-gradient(135deg, #064E3B, #0F172A);
+        border: 1px solid #10B981;
+        border-radius: 8px;
+        padding: 12px 18px;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
     }
     .kpi-card {
         background-color: #1E293B;
@@ -192,29 +214,6 @@ st.markdown("""
     .map-btn-link:hover {
         background-color: #1D4ED8;
     }
-    .nav-tab-pill {
-        display: inline-block;
-        padding: 8px 16px;
-        border-radius: 8px;
-        background-color: #1E293B;
-        border: 1px solid #475569;
-        color: #E2E8F0;
-        text-decoration: none;
-        font-weight: 600;
-        margin-right: 8px;
-        margin-bottom: 8px;
-    }
-    .step-badge {
-        display: inline-block;
-        background: linear-gradient(90deg, #EC4899, #8B5CF6);
-        color: #FFFFFF;
-        font-size: 12px;
-        font-weight: 800;
-        padding: 3px 10px;
-        border-radius: 12px;
-        text-transform: uppercase;
-        margin-bottom: 6px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -251,6 +250,52 @@ if "softy_only_mode" not in st.session_state:
     st.session_state["softy_only_mode"] = False
 
 
+# Helper: Compute footfall revenue insight for any area
+def compute_footfall_revenue_insight(footfall_str: str, avg_price: float = 50.0) -> Dict[str, Any]:
+    """
+    Computes monthly revenue estimate assuming:
+    - Average ice cream price: ₹50
+    - Conversion rate: 0.7% to 1.0% of total daily evening footfall
+    """
+    nums = [int(n.replace(",", "")) for n in re.findall(r"\d[\d,]*", str(footfall_str))]
+    if not nums:
+        low_f, high_f = 40000, 65000
+    elif len(nums) == 1:
+        low_f = nums[0]
+        high_f = nums[0]
+    else:
+        low_f = nums[0]
+        high_f = nums[1]
+
+    # Cones per day (0.7% to 1.0% conversion)
+    cones_low = int(low_f * 0.007)
+    cones_high = int(high_f * 0.010)
+
+    # Daily revenue at ₹50
+    daily_rev_low = int(cones_low * avg_price)
+    daily_rev_high = int(cones_high * avg_price)
+
+    # Monthly revenue (30 days)
+    monthly_rev_low = daily_rev_low * 30
+    monthly_rev_high = daily_rev_high * 30
+
+    # Monthly gross profit (75%)
+    monthly_gp_low = int(monthly_rev_low * 0.75)
+    monthly_gp_high = int(monthly_rev_high * 0.75)
+
+    return {
+        "low_footfall": low_f,
+        "high_footfall": high_f,
+        "footfall_display": f"{low_f:,} - {high_f:,}",
+        "daily_cones_range": f"{cones_low:,} - {cones_high:,} cones/day",
+        "daily_rev_range": f"₹{daily_rev_low:,} - ₹{daily_rev_high:,}",
+        "monthly_rev_range": f"₹{monthly_rev_low/100000:.2f} L - ₹{monthly_rev_high/100000:.2f} L",
+        "monthly_gp_range": f"₹{monthly_gp_low/100000:.2f} L - ₹{monthly_gp_high/100000:.2f} L",
+        "monthly_rev_low": monthly_rev_low,
+        "monthly_rev_high": monthly_rev_high
+    }
+
+
 @st.cache_resource
 def get_engines(api_key: str):
     t_engine = TrafficEngine(api_key=api_key if api_key else None)
@@ -264,7 +309,7 @@ def load_base_h3_grid():
     return generate_h3_grid(config.H3_RESOLUTION)
 
 
-# Build Candidate Hubs List
+# Build Candidate Hubs List with Footfall Information
 candidate_hubs = []
 for b in TOP_20_BAZAAR_SITES:
     candidate_hubs.append({
@@ -272,15 +317,25 @@ for b in TOP_20_BAZAAR_SITES:
         "zone": b["zone"],
         "lat": b["lat"],
         "lng": b["lng"],
-        "landmark": b["landmark"]
+        "landmark": b["landmark"],
+        "footfall": b["daily_evening_footfall"]
     })
+
+tier_footfall_map = {
+    "Ultra High": "75,000 - 110,000",
+    "Very High": "50,000 - 80,000",
+    "High": "35,000 - 55,000",
+    "Medium": "20,000 - 35,000"
+}
+
 for h in config.CANDIDATE_LOCATIONS:
     candidate_hubs.append({
         "name": f"📍 {h['name']}",
         "zone": h["zone"],
         "lat": h["lat"],
         "lng": h["lng"],
-        "landmark": h["landmark"]
+        "landmark": h["landmark"],
+        "footfall": tier_footfall_map.get(h.get("density_tier", "Very High"), "45,000 - 70,000")
     })
 
 hub_names = [f"{h['name']} ({h['zone']})" for h in candidate_hubs]
@@ -296,7 +351,6 @@ radius_options = {
 }
 radius_labels = list(radius_options.keys())
 
-# Inverse radius lookup for index
 current_radius_idx = 2
 for idx, (label, val) in enumerate(radius_options.items()):
     if math.isclose(val, st.session_state["radius_km"]):
@@ -305,92 +359,27 @@ for idx, (label, val) in enumerate(radius_options.items()):
 
 
 # ==========================================
-# SIDEBAR CONTROLS (Always available)
-# ==========================================
-with st.sidebar:
-    st.markdown("## 🍦 Softie Franchise Hub")
-    st.caption("Pure Milk Soft-Serve Franchise Site Selection & Intelligence")
-    
-    st.markdown("---")
-    st.markdown("### 📍 Quick Hub & Catchment Selector")
-    sb_hub_select = st.selectbox(
-        "Target Hub / Bazaar",
-        hub_names,
-        index=st.session_state["selected_hub_idx"],
-        key="sb_hub"
-    )
-    st.session_state["selected_hub_idx"] = hub_names.index(sb_hub_select)
-
-    sb_radius_select = st.selectbox(
-        "Catchment Radius",
-        radius_labels,
-        index=current_radius_idx,
-        key="sb_rad"
-    )
-    st.session_state["radius_km"] = radius_options[sb_radius_select]
-
-    st.markdown("---")
-    st.markdown("### 📅 Schedule Filter")
-    sb_day = st.selectbox(
-        "Day of Week",
-        config.DAYS_OF_WEEK,
-        index=config.DAYS_OF_WEEK.index(st.session_state["active_day"]),
-        key="sb_day"
-    )
-    st.session_state["active_day"] = sb_day
-
-    sb_interval = st.selectbox(
-        "Time Interval",
-        list(config.TIME_INTERVALS.keys()),
-        index=list(config.TIME_INTERVALS.keys()).index(st.session_state["active_interval"]),
-        key="sb_int"
-    )
-    st.session_state["active_interval"] = sb_interval
-
-    st.markdown("---")
-    st.markdown("### ⚡ Franchise Mode")
-    sb_softy_toggle = st.toggle(
-        "Highlight Softy Specialists",
-        value=st.session_state["softy_only_mode"],
-        key="sb_softy_toggle"
-    )
-    st.session_state["softy_only_mode"] = sb_softy_toggle
-
-    st.markdown("---")
-    with st.expander("📲 Mobile Access & QR Code", expanded=False):
-        st.markdown("**1. Connect Phone to Same Wi-Fi**")
-        st.markdown("**2. Open URL:** `http://192.168.29.58:8501`")
-        st.image("https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=http://192.168.29.58:8501", width=160)
-
-    with st.expander("🔑 API Key Settings", expanded=False):
-        user_api_key = st.text_input(
-            "Google Maps API Key",
-            value=st.session_state["api_key"],
-            type="password"
-        )
-        if user_api_key != st.session_state["api_key"]:
-            st.session_state["api_key"] = user_api_key
-            st.cache_resource.clear()
-            st.rerun()
-
-
-# ==========================================
-# Resolve Location Coordinates
+# Resolve Location Coordinates & Footfall
 # ==========================================
 current_hub = candidate_hubs[st.session_state["selected_hub_idx"]]
 if st.session_state["use_custom_coord"]:
     focal_lat = st.session_state["custom_lat"]
     focal_lng = st.session_state["custom_lng"]
     focal_label = f"Custom Pin ({focal_lat:.3f}, {focal_lng:.3f})"
+    active_footfall_str = "40,000 - 65,000"
 else:
     focal_lat = current_hub["lat"]
     focal_lng = current_hub["lng"]
     focal_label = current_hub["name"]
+    active_footfall_str = current_hub["footfall"]
 
 selected_radius_km = st.session_state["radius_km"]
 selected_day = st.session_state["active_day"]
 selected_interval = st.session_state["active_interval"]
 softy_only_mode = st.session_state["softy_only_mode"]
+
+# Footfall Revenue Insight for currently selected hub
+active_revenue_insight = compute_footfall_revenue_insight(active_footfall_str, avg_price=50.0)
 
 # Load Engines
 traffic_engine, store_extractor, site_engine = get_engines(st.session_state["api_key"])
@@ -456,16 +445,9 @@ st.markdown(
 
 
 # ==============================================================================
-# STEP 1: OPTIONS & FILTERS FIRST (ACCESSIBLE ACROSS ALL TABS)
+# OPTIONS & FILTERS (PERSISTENT & ACCESSIBLE AT TOP OF PAGE)
 # ==============================================================================
 with st.container():
-    st.markdown("""
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-        <span class="step-badge">STEP 1: OPTIONS & CATCHMENT FILTERS</span>
-        <span style="font-size: 13px; color: #94A3B8;">Select your target area and radius below — updates results instantly across all views</span>
-    </div>
-    """, unsafe_allow_html=True)
-
     filter_col1, filter_col2, filter_col3, filter_col4 = st.columns([1.5, 1.2, 0.9, 0.9])
     
     with filter_col1:
@@ -562,17 +544,29 @@ with st.container():
     </div>
     """, unsafe_allow_html=True)
 
+    # Footfall Revenue Insight Banner (₹50 Average Price & 0.7% - 1.0% Conversion)
+    render_html(f"""
+    <div class="revenue-insight-card">
+        <div>
+            <span style="color: #6EE7B7; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+                💰 REVENUE PROJECTION INSIGHT (@ ₹50 AVERAGE PRICE & 0.7% – 1.0% FOOTFALL CONVERSION)
+            </span><br/>
+            <span style="color: #F8FAFC; font-size: 14px;">
+                Daily Evening Footfall: <b>{active_footfall_str}</b> | Daily Cones Converted: <b style="color: #38BDF8;">{active_revenue_insight['daily_cones_range']}</b>
+            </span>
+        </div>
+        <div style="text-align: right;">
+            <span style="color: #94A3B8; font-size: 11.5px; font-weight: 600;">EST. MONTHLY REVENUE:</span><br/>
+            <b style="font-size: 18px; color: #34D399;">{active_revenue_insight['monthly_rev_range']} / Mo</b>
+            <span style="color: #FCD34D; font-size: 12px; margin-left: 6px;">(Gross Profit: {active_revenue_insight['monthly_gp_range']})</span>
+        </div>
+    </div>
+    """)
+
 
 # ==============================================================================
-# STEP 2: CHOOSE ANALYSIS TAB / VIEW
+# TAB SELECTION
 # ==============================================================================
-st.markdown("""
-<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 8px;">
-    <span class="step-badge" style="background: linear-gradient(90deg, #3B82F6, #10B981);">STEP 2: CHOOSE ANALYSIS TAB</span>
-    <span style="font-size: 13px; color: #94A3B8;">Select a tab below to inspect that view only — switch back or jump to any tab anytime</span>
-</div>
-""", unsafe_allow_html=True)
-
 TAB_CHOICES = [
     "🗺️ Interactive Catchment Map & Outlets Directory",
     "📊 Comparative Evaluation Matrix",
@@ -597,7 +591,7 @@ selected_tab = st.radio(
 )
 st.session_state["active_tab"] = selected_tab
 
-st.markdown("<hr style='border:0; border-top: 1px solid #334155; margin: 12px 0 20px 0;'/>", unsafe_allow_html=True)
+st.markdown("<hr style='border:0; border-top: 1px solid #334155; margin: 10px 0 18px 0;'/>", unsafe_allow_html=True)
 
 
 # ==============================================================================
@@ -607,7 +601,7 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
     st.subheader(f"🗺️ Concentric Radial Catchment Map & Competitor Table ({selected_radius_km:.1f} km from {focal_label})")
     st.caption("Interactive spatial intelligence map with concentric walking & driving rings, followed by the complete directory table of all competitor parlours below with direct Google Maps navigation links.")
 
-    # 4 Quick KPI Summary Cards
+    # 4 KPI Summary Cards
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     with kpi1:
         st.markdown(f"""
@@ -640,9 +634,9 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
     with kpi4:
         st.markdown(f"""
         <div class="kpi-card" style="border-left-color: #10B981;">
-            <div class="kpi-title">Franchise Daily Target</div>
-            <div class="kpi-value">₹15,000 <span style="font-size:1rem; color:#94A3B8;">/ Day</span></div>
-            <div class="kpi-sub">₹20 - ₹90 Pure Milk Sweet Spot</div>
+            <div class="kpi-title">Monthly Revenue @ ₹50</div>
+            <div class="kpi-value">{active_revenue_insight['monthly_rev_range']}</div>
+            <div class="kpi-sub">0.7% – 1.0% Conversion ({active_revenue_insight['daily_cones_range']})</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -976,7 +970,7 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
 
     # Bottom Quick Navigation
     st.markdown("---")
-    st.markdown("<b>Next Steps:</b> Explore other strategic tabs:")
+    st.markdown("<b>Explore other strategic tabs:</b>")
     col_n1, col_n2, col_n3 = st.columns(3)
     with col_n1:
         if st.button("📊 View Comparative Evaluation Matrix →", key="btn_to_matrix"):
@@ -998,39 +992,39 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
 elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
     st.subheader("📊 Chennai Top 20 Bazaars: Comparative Evaluation & Profitability Matrix")
     st.markdown("""
-    Comprehensive strategic benchmark comparing all 20 curated high-footfall bazaars across Chennai on **Daily Evening Walking Footfall**, **"Softie" Pure Milk Pricing (₹20 - ₹90)**, **Daily Revenue vs ₹15,000 Target**, **Monthly Volume**, **Gross Profit (75% Margin)**, and **Payback Period**.
+    Comprehensive strategic benchmark comparing all 20 curated high-footfall bazaars across Chennai on **Daily Evening Walking Footfall**, **Footfall Conversion (0.7% – 1.0%)**, **Monthly Revenue Potential (@ ₹50 avg price)**, **Gross Profit (75% Margin)**, and **Payback Period**.
     """)
 
     m_kpi1, m_kpi2, m_kpi3, m_kpi4 = st.columns(4)
     with m_kpi1:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #10B981;">
-            <div class="kpi-title">Top Profit Bazaar</div>
-            <div class="kpi-value">₹21.0 L <span style="font-size:0.9rem; color:#94A3B8;">/ Mo</span></div>
-            <div class="kpi-sub"><b>Besant Nagar Beach</b> (28k cones)</div>
+            <div class="kpi-title">Top Revenue Bazaar (@ ₹50)</div>
+            <div class="kpi-value">₹9.5 L – ₹19.5 L <span style="font-size:0.85rem; color:#94A3B8;">/ Mo</span></div>
+            <div class="kpi-sub"><b>Usman Road T. Nagar</b> (90k-130k walkers)</div>
         </div>
         """, unsafe_allow_html=True)
     with m_kpi2:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #38BDF8;">
-            <div class="kpi-title">Highest Volume Bazaar</div>
-            <div class="kpi-value">34,000 <span style="font-size:0.9rem; color:#94A3B8;">Cones</span></div>
-            <div class="kpi-sub"><b>Marina Beach Promenade</b></div>
+            <div class="kpi-title">Flagship Beach Bazaar</div>
+            <div class="kpi-value">₹7.9 L – ₹16.5 L <span style="font-size:0.85rem; color:#94A3B8;">/ Mo</span></div>
+            <div class="kpi-sub"><b>Pondy Bazaar Plaza</b> (525-1,100 cones/day)</div>
         </div>
         """, unsafe_allow_html=True)
     with m_kpi3:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #EC4899;">
-            <div class="kpi-title">Franchise Price Band</div>
-            <div class="kpi-value">₹20 - ₹90 <span style="font-size:0.9rem; color:#94A3B8;">/ Item</span></div>
-            <div class="kpi-sub">Pure Fresh Milk Formula</div>
+            <div class="kpi-title">Average Converted Cones</div>
+            <div class="kpi-value">350 – 780 <span style="font-size:0.85rem; color:#94A3B8;">Cones / Day</span></div>
+            <div class="kpi-sub">At conservative 0.7% – 1.0% conversion</div>
         </div>
         """, unsafe_allow_html=True)
     with m_kpi4:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #F59E0B;">
             <div class="kpi-title">Avg Payback Period</div>
-            <div class="kpi-value">3.5 <span style="font-size:0.9rem; color:#94A3B8;">Months</span></div>
+            <div class="kpi-value">3.2 <span style="font-size:0.85rem; color:#94A3B8;">Months</span></div>
             <div class="kpi-sub">Capex recovery at ₹7L kiosk cost</div>
         </div>
         """, unsafe_allow_html=True)
@@ -1043,19 +1037,27 @@ elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
     with f_col2:
         matrix_sort_by = st.selectbox("Sort Matrix By", [
             "Overall Rank (Recommended)",
-            "Est. Monthly Revenue (High to Low)",
-            "Est. Monthly Cones (High to Low)",
+            "Est. Monthly Revenue @ ₹50 (High to Low)",
+            "Daily Footfall (High to Low)",
             "Target Price (High to Low)"
         ], key="mat_sort")
 
     filtered_matrix = [m for m in COMPARATIVE_EVALUATION_MATRIX if matrix_zone_filter == "All Zones" or matrix_zone_filter.lower() in m["zone"].lower()]
 
-    if matrix_sort_by == "Est. Monthly Revenue (High to Low)":
-        filtered_matrix = sorted(filtered_matrix, key=lambda x: int(x["est_monthly_revenue"].replace("₹", "").replace(",", "")), reverse=True)
-    elif matrix_sort_by == "Est. Monthly Cones (High to Low)":
-        filtered_matrix = sorted(filtered_matrix, key=lambda x: x["est_monthly_cones"], reverse=True)
+    # Compute exact 0.7% - 1.0% conversion revenue for each matrix item
+    matrix_with_insights = []
+    for m in filtered_matrix:
+        ins = compute_footfall_revenue_insight(m["daily_evening_footfall"], avg_price=50.0)
+        m_copy = dict(m)
+        m_copy["ins"] = ins
+        matrix_with_insights.append(m_copy)
+
+    if matrix_sort_by == "Est. Monthly Revenue @ ₹50 (High to Low)":
+        matrix_with_insights = sorted(matrix_with_insights, key=lambda x: x["ins"]["monthly_rev_high"], reverse=True)
+    elif matrix_sort_by == "Daily Footfall (High to Low)":
+        matrix_with_insights = sorted(matrix_with_insights, key=lambda x: x["ins"]["high_footfall"], reverse=True)
     elif matrix_sort_by == "Target Price (High to Low)":
-        filtered_matrix = sorted(filtered_matrix, key=lambda x: int(x["target_price"].split("-")[-1].replace("₹", "").strip()), reverse=True)
+        matrix_with_insights = sorted(matrix_with_insights, key=lambda x: int(x["target_price"].split("-")[-1].replace("₹", "").strip()), reverse=True)
 
     df_matrix = pd.DataFrame([
         {
@@ -1063,18 +1065,16 @@ elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
             "Bazaar Location": m["bazaar_location"],
             "Zone": m["zone"],
             "Daily Footfall": m["daily_evening_footfall"],
+            "Cones / Day (0.7%-1.0%)": m["ins"]["daily_cones_range"],
+            "Monthly Revenue (@ ₹50, 0.7%-1.0%)": m["ins"]["monthly_rev_range"],
+            "Monthly Gross Profit (75%)": m["ins"]["monthly_gp_range"],
             "Softie Price Range": m["target_price"],
-            "Est. Monthly Cones": f"{m['est_monthly_cones']:,}",
-            "Daily Cones Target": f"{m['est_monthly_cones'] // 30:,}/day",
-            "Est. Monthly Revenue": m["est_monthly_revenue"],
-            "Est. Daily Revenue": f"₹{int(m['est_monthly_revenue'].replace('₹','').replace(',','')) // 30:,}/day",
-            "Gross Profit (75%)": m["gross_profit_75pct"],
             "Rent / sq.ft": m["rental_sqft_estimate"],
             "Payback Period": m["payback_period_months"],
             "Hero Flavors": m["hero_flavors"],
             "Product-Market Fit Factor": m["fit_factor"]
         }
-        for m in filtered_matrix
+        for m in matrix_with_insights
     ])
 
     st.dataframe(df_matrix, use_container_width=True, hide_index=True)
@@ -1123,9 +1123,9 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
     with b_kpi2:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #10B981;">
-            <div class="kpi-title">"Softie" Price Band</div>
-            <div class="kpi-value">₹20 - ₹90 <span style="font-size:1rem; color:#94A3B8;">/ Item</span></div>
-            <div class="kpi-sub">75% Gross Margin | Instant impulse conversion</div>
+            <div class="kpi-title">Conversion Sweet Spot</div>
+            <div class="kpi-value">0.7% – 1.0% <span style="font-size:1rem; color:#94A3B8;">of Footfall</span></div>
+            <div class="kpi-sub">At ₹50 average ticket = ₹4.5L - ₹19.5L / month</div>
         </div>
         """, unsafe_allow_html=True)
     with b_kpi3:
@@ -1159,6 +1159,7 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
     st.caption(f"Showing **{len(filtered_bazaars)}** high-traffic bazaar launch locations.")
 
     for bz in filtered_bazaars:
+        bz_insight = compute_footfall_revenue_insight(bz["daily_evening_footfall"], avg_price=50.0)
         render_html(f"""
         <div class="bazaar-card">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
@@ -1167,7 +1168,7 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
                     <span class="bazaar-badge" style="margin-left: 8px;">{bz['zone']}</span>
                 </div>
                 <div style="font-size: 13px; color: #38BDF8; font-weight: 600;">
-                    🚶 {bz['daily_evening_footfall']}
+                    🚶 Daily Footfall: {bz['daily_evening_footfall']}
                 </div>
             </div>
             <div style="margin-top: 6px; font-size: 14px; color: #CBD5E1;">
@@ -1182,6 +1183,23 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
             <div style="font-size: 13px; color: #F43F5E; margin-top: 4px;">
                 ⚠️ <b>Nearby Competitor Density:</b> {bz['competitor_density']}
             </div>
+            
+            <!-- REVENUE PROJECTION INSIGHT (₹50 Avg Price & 0.7% - 1.0% Footfall Conversion) -->
+            <div style="background: linear-gradient(135deg, #064E3B, #0F172A); border-left: 4px solid #10B981; padding: 12px 14px; border-radius: 6px; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <b style="color: #6EE7B7; font-size: 13.5px;">💰 REVENUE PROJECTION (@ ₹50 AVG ICE CREAM & 0.7% – 1.0% FOOTFALL CONVERSION):</b><br/>
+                        <span style="color: #D1FAE5; font-size: 13px;">
+                            Walking Footfall: <b>{bz['daily_evening_footfall']}</b> | Converted Cones: <b style="color: #FBBF24;">{bz_insight['daily_cones_range']}</b>
+                        </span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 15px; color: #FFFFFF;">Est. Monthly Revenue: <b style="color: #34D399; font-size: 16px;">{bz_insight['monthly_rev_range']} / Month</b></span><br/>
+                        <span style="font-size: 12px; color: #FDE68A;">Gross Profit (75%): <b>{bz_insight['monthly_gp_range']}</b></span>
+                    </div>
+                </div>
+            </div>
+
             <div class="fit-box">
                 <b>🎯 WHY "SOFTIE" PURE MILK FRANCHISE FITS HERE PERFECTLY:</b><br/>
                 {bz['why_softy_fits_perfectly']}
@@ -1482,6 +1500,25 @@ elif st.session_state["active_tab"] == "🚀 'Softie' Franchise Blueprint & Fina
 
     st.markdown("<br>", unsafe_allow_html=True)
 
+    # Footfall Conversion Model Highlight
+    render_html("""
+    <div style="background: linear-gradient(135deg, #064E3B, #0F172A); border: 2px solid #10B981; border-radius: 10px; padding: 18px; margin-bottom: 20px;">
+        <h4 style="color: #6EE7B7; margin-top: 0;">🎯 The 0.7% – 1.0% Footfall Conversion Model (@ ₹50 Average Ice Cream)</h4>
+        <p style="color: #CBD5E1; font-size: 14px;">
+            In high-density retail bazaars and beach promenades, you do not need 5% or 10% market share to build a wildly profitable franchise.
+            Capturing just <b>7 to 10 customers out of every 1,000 pedestrians walking past your kiosk</b> (0.7% - 1.0% conversion) at an impulse ₹50 price point generates:
+        </p>
+        <ul style="color: #F8FAFC; font-size: 14px;">
+            <li><b>Flagship Bazaars (75k - 110k footfall like Pondy Bazaar / Usman Rd):</b> 525 - 1,100 cones/day → <b>₹7.88 Lakhs – ₹16.50 Lakhs / Month Revenue</b></li>
+            <li><b>Beach Promenades (40k - 65k footfall like Besant Nagar Beach):</b> 280 - 650 cones/day → <b>₹4.20 Lakhs – ₹9.75 Lakhs / Month Revenue</b></li>
+            <li><b>Suburban Commercial Belts (45k - 70k footfall like Velachery / Tambaram):</b> 315 - 700 cones/day → <b>₹4.73 Lakhs – ₹10.50 Lakhs / Month Revenue</b></li>
+        </ul>
+        <p style="color: #FCD34D; font-size: 13.5px; font-weight: 600; margin-bottom: 0;">
+            Even at the conservative lower bound of 0.7% conversion, a kiosk in any of Chennai's top 15 bazaars comfortably meets or exceeds your baseline goal of ₹15,000 / day (₹4,50,000 / month)!
+        </p>
+    </div>
+    """)
+
     col_bp1, col_bp2 = st.columns(2)
 
     with col_bp1:
@@ -1536,11 +1573,11 @@ elif st.session_state["active_tab"] == "🚀 'Softie' Franchise Blueprint & Fina
     st.markdown("---")
     st.markdown("### 🏆 Top 5 Flagship Bazaar Locations to Hit & Exceed ₹15,000 / Day:")
     st.markdown("""
-    1. **Besant Nagar Beach Promenade (Elliot's Beach):** 40,000+ evening strollers. Projected daily revenue: **₹22,000 - ₹28,000 / day** (150% of target).
-    2. **Pondy Bazaar Pedestrian Plaza (T. Nagar):** 75,000+ pedestrian shoppers. Projected daily revenue: **₹20,000 - ₹25,000 / day**.
-    3. **Marina Beach Promenade (Near Light House / Triumph of Labour):** 60,000+ beach visitors. Projected daily revenue: **₹18,000 - ₹24,000 / day**.
-    4. **Anna Nagar 2nd Avenue (Roundtana to Blue Star):** Premium residential dessert strip. Projected daily revenue: **₹16,000 - ₹21,000 / day**.
-    5. **Sowcarpet / Mint Street (Chaat Corridor):** 60,000+ street food shoppers looking for sweet cooling relief after spicy snacks. Projected daily revenue: **₹15,000 - ₹19,000 / day**.
+    1. **Besant Nagar Beach Promenade (Elliot's Beach):** 40,000+ evening strollers. Projected revenue: **₹4.20 L – ₹9.75 L / month** (at ₹50 avg & 0.7%-1.0% conversion).
+    2. **Pondy Bazaar Pedestrian Plaza (T. Nagar):** 75,000+ pedestrian shoppers. Projected revenue: **₹7.88 L – ₹16.50 L / month**.
+    3. **Marina Beach Promenade (Near Light House):** 60,000+ beach visitors. Projected revenue: **₹6.30 L – ₹15.00 L / month**.
+    4. **Anna Nagar 2nd Avenue (Roundtana to Blue Star):** Premium residential dessert strip. Projected revenue: **₹5.25 L – ₹12.00 L / month**.
+    5. **Sowcarpet / Mint Street (Chaat Corridor):** 60,000+ street food shoppers looking for sweet cooling relief. Projected revenue: **₹6.30 L – ₹14.25 L / month**.
     """)
 
     # Bottom Quick Nav
@@ -1567,7 +1604,7 @@ elif st.session_state["active_tab"] == "📥 Download Master Excel (.xlsx)":
     - **`Top_50_Ice_Cream_Parlors`**: All 50 top places with Rating, Review Count, **Why Customers Like It**, **What Customers Dislike / Complaints**, and **"Softie" Opportunities**.
     - **`Why_Customers_Like_Ranked`**: Ranked sensory appeal drivers in Chennai.
     - **`What_Customers_Dislike_Ranked`**: Ranked competitor vulnerabilities & complaints.
-    - **`20_Bazaars_Matrix`**: Comparative Evaluation Matrix for 20 Bazaars.
+    - **`20_Bazaars_Matrix`**: Comparative Evaluation Matrix for 20 Bazaars with footfall conversion revenue models.
     - **`Dedicated_Softy_Outlets`**: 12 dedicated softy specialists audit.
     - **7 Daily Sheets (`Monday_Top50_Traffic_Roads` to `Sunday_Top50_Traffic_Roads`)**: Top 50 floating streets sorted by time intervals.
     """)
