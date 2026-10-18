@@ -4,14 +4,16 @@ Exclusively focused on Ice Cream Parlours & Dessert Places:
 1. Options & Catchment Filters at the top of the page (persistent & full-width, no sidebar clutter).
 2. Clean Single-Tab Navigation (Select Comparative Evaluation, Map, Bazaars, etc. with easy back-and-forth).
 3. Interactive Catchment Map with Table Below Map containing direct Clickable Google Maps Links.
-4. Footfall Revenue Insights (@ ₹50 average price & 0.7% - 1.0% footfall conversion) in EVERY area and bazaar.
-5. "Softie" Pure Milk Franchise Strategic Blueprint:
+4. Footfall Revenue Insights (@ ₹50 average price, 40% COGS, 60% Gross Margin, 0.7% - 1.0% footfall conversion) in EVERY area and bazaar.
+5. High-Footfall Consumer Gathering Bazaars (including Washermanpet MC Road, Pondy Bazaar, Sowcarpet, etc.) with exact crowd gathering hotspots.
+6. Dedicated Softy Specialists with active Google Maps links.
+7. "Softie" Pure Milk Franchise Strategic Blueprint:
    - Brand: Softie (Franchise Model)
    - 100% Pure Fresh Dairy Milk Quality
-   - Core Price Starts at ₹20, Maximum Cost ₹90
+   - Core Price Starts at ₹20, Maximum Cost ₹90, Blended Avg ₹50
+   - COGS: 40%, Gross Margin: 60%
    - Daily Sales Target: Average ₹15,000 / day (₹4,50,000 / month)
-6. 20 High-Footfall Bazaars & Comparative Matrix.
-7. Feeder Traffic & 14-Sheet Master Excel Export.
+8. Feeder Traffic & 14-Sheet Master Excel Export.
 """
 
 import json
@@ -20,7 +22,6 @@ import io
 import math
 import re
 import urllib.parse
-import textwrap
 from typing import Dict, List, Any
 import streamlit as st
 import pandas as pd
@@ -30,7 +31,8 @@ import altair as alt
 
 def render_html(html_str: str):
     """Safely render HTML without Markdown indented-code-block interference."""
-    st.markdown(textwrap.dedent(html_str).strip(), unsafe_allow_html=True)
+    cleaned = "\n".join(line.strip() for line in html_str.splitlines() if line.strip())
+    st.markdown(cleaned, unsafe_allow_html=True)
 
 import config
 from spatial_grid import (
@@ -190,6 +192,16 @@ st.markdown("""
         font-size: 12px;
         display: inline-block;
     }
+    .hotspot-box {
+        background-color: #1E3A8A;
+        border-left: 4px solid #3B82F6;
+        padding: 10px 14px;
+        border-radius: 6px;
+        margin-top: 8px;
+        font-size: 13.5px;
+        color: #DBEAFE;
+        line-height: 1.5;
+    }
     .fit-box {
         background-color: #064E3B;
         border-left: 4px solid #10B981;
@@ -205,11 +217,12 @@ st.markdown("""
         background-color: #2563EB;
         color: #FFFFFF !important;
         font-weight: 600;
-        padding: 4px 10px;
+        padding: 6px 12px;
         border-radius: 6px;
         text-decoration: none;
-        font-size: 12px;
+        font-size: 12.5px;
         transition: background-color 0.2s;
+        margin-top: 6px;
     }
     .map-btn-link:hover {
         background-color: #1D4ED8;
@@ -250,12 +263,14 @@ if "softy_only_mode" not in st.session_state:
     st.session_state["softy_only_mode"] = False
 
 
-# Helper: Compute footfall revenue insight for any area
+# Helper: Compute footfall revenue insight for any area (40% COGS, 60% Gross Margin)
 def compute_footfall_revenue_insight(footfall_str: str, avg_price: float = 50.0) -> Dict[str, Any]:
     """
     Computes monthly revenue estimate assuming:
     - Average ice cream price: ₹50
     - Conversion rate: 0.7% to 1.0% of total daily evening footfall
+    - COGS: 40% (₹20 per cone)
+    - Gross Profit Margin: 60% (₹30 per cone)
     """
     nums = [int(n.replace(",", "")) for n in re.findall(r"\d[\d,]*", str(footfall_str))]
     if not nums:
@@ -279,9 +294,13 @@ def compute_footfall_revenue_insight(footfall_str: str, avg_price: float = 50.0)
     monthly_rev_low = daily_rev_low * 30
     monthly_rev_high = daily_rev_high * 30
 
-    # Monthly gross profit (75%)
-    monthly_gp_low = int(monthly_rev_low * 0.75)
-    monthly_gp_high = int(monthly_rev_high * 0.75)
+    # Monthly COGS (40%)
+    monthly_cogs_low = int(monthly_rev_low * 0.40)
+    monthly_cogs_high = int(monthly_rev_high * 0.40)
+
+    # Monthly gross profit (60% margin, 40% COGS)
+    monthly_gp_low = int(monthly_rev_low * 0.60)
+    monthly_gp_high = int(monthly_rev_high * 0.60)
 
     return {
         "low_footfall": low_f,
@@ -291,6 +310,7 @@ def compute_footfall_revenue_insight(footfall_str: str, avg_price: float = 50.0)
         "daily_rev_range": f"₹{daily_rev_low:,} - ₹{daily_rev_high:,}",
         "monthly_rev_range": f"₹{monthly_rev_low/100000:.2f} L - ₹{monthly_rev_high/100000:.2f} L",
         "monthly_gp_range": f"₹{monthly_gp_low/100000:.2f} L - ₹{monthly_gp_high/100000:.2f} L",
+        "monthly_cogs_range": f"₹{monthly_cogs_low/100000:.2f} L - ₹{monthly_cogs_high/100000:.2f} L",
         "monthly_rev_low": monthly_rev_low,
         "monthly_rev_high": monthly_rev_high
     }
@@ -309,7 +329,7 @@ def load_base_h3_grid():
     return generate_h3_grid(config.H3_RESOLUTION)
 
 
-# Build Candidate Hubs List with Footfall Information
+# Build Candidate Hubs List with Footfall & Gathering Hotspots
 candidate_hubs = []
 for b in TOP_20_BAZAAR_SITES:
     candidate_hubs.append({
@@ -318,6 +338,7 @@ for b in TOP_20_BAZAAR_SITES:
         "lat": b["lat"],
         "lng": b["lng"],
         "landmark": b["landmark"],
+        "hotspot": b.get("exact_gathering_hotspot", b["landmark"]),
         "footfall": b["daily_evening_footfall"]
     })
 
@@ -335,6 +356,7 @@ for h in config.CANDIDATE_LOCATIONS:
         "lat": h["lat"],
         "lng": h["lng"],
         "landmark": h["landmark"],
+        "hotspot": f"Pedestrian commercial cluster around {h['landmark']}",
         "footfall": tier_footfall_map.get(h.get("density_tier", "Very High"), "45,000 - 70,000")
     })
 
@@ -367,18 +389,20 @@ if st.session_state["use_custom_coord"]:
     focal_lng = st.session_state["custom_lng"]
     focal_label = f"Custom Pin ({focal_lat:.3f}, {focal_lng:.3f})"
     active_footfall_str = "40,000 - 65,000"
+    active_hotspot_str = "Custom GPS location pedestrian radius"
 else:
     focal_lat = current_hub["lat"]
     focal_lng = current_hub["lng"]
     focal_label = current_hub["name"]
     active_footfall_str = current_hub["footfall"]
+    active_hotspot_str = current_hub["hotspot"]
 
 selected_radius_km = st.session_state["radius_km"]
 selected_day = st.session_state["active_day"]
 selected_interval = st.session_state["active_interval"]
 softy_only_mode = st.session_state["softy_only_mode"]
 
-# Footfall Revenue Insight for currently selected hub
+# Footfall Revenue Insight for currently selected hub (40% COGS, 60% Gross Margin)
 active_revenue_insight = compute_footfall_revenue_insight(active_footfall_str, avg_price=50.0)
 
 # Load Engines
@@ -439,7 +463,7 @@ h3_with_congestion = interpolate_corridor_congestion_to_h3(base_h3_gdf, corridor
 # ==============================================================================
 st.markdown('<div class="main-header">🍦 "Softie" — Pure Milk Soft-Serve Franchise Site Selection & Catchment Intelligence</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="sub-header">Premium Milk-Based Franchise Model • Core Rate Starts at <b>₹20</b> • Max Rate <b>₹90</b> • Target Sales: <b>₹15,000 / Day</b> • Zero Watery Premixes</div>',
+    '<div class="sub-header">Premium Milk-Based Franchise Model • Core Rate Starts at <b>₹20</b> • Max Rate <b>₹90</b> • <b>40% COGS (60% Gross Margin)</b> • Target Sales: <b>₹15,000 / Day</b></div>',
     unsafe_allow_html=True
 )
 
@@ -517,7 +541,7 @@ with st.container():
                 st.session_state["softy_only_mode"] = softy_tog
                 st.rerun()
 
-    # Dynamic Catchment Status Banner
+    # Dynamic Catchment Status Banner with Consumer Gathering Hotspot
     st.markdown(f"""
     <div class="status-banner">
         <div>
@@ -544,36 +568,38 @@ with st.container():
     </div>
     """, unsafe_allow_html=True)
 
-    # Footfall Revenue Insight Banner (₹50 Average Price & 0.7% - 1.0% Conversion)
+    # Footfall Revenue Insight Banner (@ ₹50 Average Price, 40% COGS, 60% Gross Margin)
     render_html(f"""
     <div class="revenue-insight-card">
         <div>
             <span style="color: #6EE7B7; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                💰 REVENUE PROJECTION INSIGHT (@ ₹50 AVERAGE PRICE & 0.7% – 1.0% FOOTFALL CONVERSION)
+                💰 REVENUE PROJECTION INSIGHT (@ ₹50 AVG ICE CREAM • 0.7% – 1.0% FOOTFALL CONVERSION • 40% COGS)
             </span><br/>
             <span style="color: #F8FAFC; font-size: 14px;">
-                Daily Evening Footfall: <b>{active_footfall_str}</b> | Daily Cones Converted: <b style="color: #38BDF8;">{active_revenue_insight['daily_cones_range']}</b>
+                Daily Evening Footfall: <b>{active_footfall_str}</b> | Cones Converted: <b style="color: #38BDF8;">{active_revenue_insight['daily_cones_range']}</b>
+            </span><br/>
+            <span style="color: #CBD5E1; font-size: 12.5px;">
+                📍 <b>Crowd Hotspot:</b> {active_hotspot_str}
             </span>
         </div>
         <div style="text-align: right;">
             <span style="color: #94A3B8; font-size: 11.5px; font-weight: 600;">EST. MONTHLY REVENUE:</span><br/>
             <b style="font-size: 18px; color: #34D399;">{active_revenue_insight['monthly_rev_range']} / Mo</b>
-            <span style="color: #FCD34D; font-size: 12px; margin-left: 6px;">(Gross Profit: {active_revenue_insight['monthly_gp_range']})</span>
+            <span style="color: #FCD34D; font-size: 12px; margin-left: 6px; display: block;">(Gross Profit @ 60%: {active_revenue_insight['monthly_gp_range']})</span>
         </div>
     </div>
     """)
 
 
 # ==============================================================================
-# TAB SELECTION
+# TAB SELECTION (Clean 8 Tabs without What Customers Likes/Dislikes)
 # ==============================================================================
 TAB_CHOICES = [
     "🗺️ Interactive Catchment Map & Outlets Directory",
     "📊 Comparative Evaluation Matrix",
-    "🛍️ Top 20 Bazaar Sites & Product-Market Fit",
+    "🛍️ Top 20 Bazaar Sites & Gathering Hotspots",
     "⚡ Dedicated Softy Specialists in Chennai",
     "🍨 All Ice Cream Parlours Directory (Top 50)",
-    "💬 What Customers Like vs Complaints",
     "🚦 Feeder Road Traffic & Commuters",
     "🚀 'Softie' Franchise Blueprint & Financial Model",
     "📥 Download Master Excel (.xlsx)"
@@ -614,7 +640,7 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
 
     with kpi2:
         st.markdown(f"""
-        <div class="kpi-card" style="border-left-color: #3B82F6;">
+        <div class="kpi-card" style="border-left-color: #38BDF8;">
             <div class="kpi-title">Radial Breakdown (1/2/5km)</div>
             <div class="kpi-value">{count_1km} <span style="font-size:1.0rem; color:#94A3B8;">(1km)</span> / {count_2km} <span style="font-size:1.0rem; color:#94A3B8;">(2km)</span></div>
             <div class="kpi-sub">{count_5km} total parlours in 5 km trade area</div>
@@ -636,7 +662,7 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
         <div class="kpi-card" style="border-left-color: #10B981;">
             <div class="kpi-title">Monthly Revenue @ ₹50</div>
             <div class="kpi-value">{active_revenue_insight['monthly_rev_range']}</div>
-            <div class="kpi-sub">0.7% – 1.0% Conversion ({active_revenue_insight['daily_cones_range']})</div>
+            <div class="kpi-sub">60% Gross Profit: {active_revenue_insight['monthly_gp_range']}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -785,8 +811,8 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
             "rating": "High-Footfall Bazaar",
             "reviews": bz["daily_evening_footfall"],
             "dist": f"{dist_val} km",
-            "ring": bz["bazaar_type"],
-            "likes": f"Fit: {bz['why_softy_fits_perfectly'][:110]}...",
+            "ring": bz.get("exact_gathering_hotspot", bz["landmark"]),
+            "likes": f"Hotspot: {bz.get('exact_gathering_hotspot', bz['landmark'])[:110]}...",
             "complaints": f"Peak: {bz['peak_walking_hours']} | Flavors: {bz['recommended_hero_flavors']}",
             "coordinates": [bz["lng"], bz["lat"]],
             "color": [6, 182, 212, 240],
@@ -822,8 +848,8 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
             <span>{zone}</span> | Distance: <b>{dist}</b><br/>
             <b>Rating:</b> {rating} ★ ({reviews} reviews)<br/>
             <hr style="border:0; border-top:1px solid #334155; margin:6px 0;"/>
-            <b style="color: #34D399;">Likes:</b> {likes}<br/>
-            <b style="color: #F43F5E;">Complaints:</b> {complaints}
+            <b style="color: #34D399;">Hotspot/Likes:</b> {likes}<br/>
+            <b style="color: #F43F5E;">Details:</b> {complaints}
         </div>
         """,
         "style": {"color": "white"}
@@ -843,7 +869,7 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
     <div style="display: flex; gap: 20px; align-items: center; justify-content: center; background-color: #1E293B; padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 13px; flex-wrap: wrap;">
         <div><span style="display:inline-block; width:14px; height:14px; background-color:#FACC15; border-radius:50%; margin-right:6px; vertical-align:middle;"></span><b>Your Focal Point</b></div>
         <div><span style="display:inline-block; width:14px; height:14px; background-color:#EC4899; border-radius:50%; margin-right:6px; vertical-align:middle;"></span><b>Ice Cream Parlour (Pink)</b></div>
-        <div><span style="display:inline-block; width:14px; height:14px; background-color:#06B6D4; border-radius:50%; margin-right:6px; vertical-align:middle;"></span><b>20 Top Bazaars (Cyan)</b></div>
+        <div><span style="display:inline-block; width:14px; height:14px; background-color:#06B6D4; border-radius:50%; margin-right:6px; vertical-align:middle;"></span><b>Top Big Bazaars (Cyan)</b></div>
         <div><span style="display:inline-block; width:14px; height:14px; border:2px solid #EC4899; border-radius:50%; margin-right:6px; vertical-align:middle;"></span><b>1 km Catchment</b></div>
         <div><span style="display:inline-block; width:14px; height:14px; border:2px solid #F59E0B; border-radius:50%; margin-right:6px; vertical-align:middle;"></span><b>2 km Catchment</b></div>
         <div><span style="display:inline-block; width:14px; height:14px; border:2px solid #3B82F6; border-radius:50%; margin-right:6px; vertical-align:middle;"></span><b>5 km Trade Area</b></div>
@@ -977,8 +1003,8 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
             st.session_state["active_tab"] = "📊 Comparative Evaluation Matrix"
             st.rerun()
     with col_n2:
-        if st.button("🛍️ View Top 20 Bazaar Sites →", key="btn_to_bazaars"):
-            st.session_state["active_tab"] = "🛍️ Top 20 Bazaar Sites & Product-Market Fit"
+        if st.button("🛍️ View Top Bazaar Sites & Gathering Hotspots →", key="btn_to_bazaars"):
+            st.session_state["active_tab"] = "🛍️ Top 20 Bazaar Sites & Gathering Hotspots"
             st.rerun()
     with col_n3:
         if st.button("🚀 View 'Softie' Financial Blueprint →", key="btn_to_blueprint"):
@@ -990,9 +1016,9 @@ if st.session_state["active_tab"] == "🗺️ Interactive Catchment Map & Outlet
 # TAB 2: COMPARATIVE EVALUATION MATRIX
 # ==============================================================================
 elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
-    st.subheader("📊 Chennai Top 20 Bazaars: Comparative Evaluation & Profitability Matrix")
+    st.subheader("📊 Chennai Top Bazaars: Comparative Evaluation & Profitability Matrix")
     st.markdown("""
-    Comprehensive strategic benchmark comparing all 20 curated high-footfall bazaars across Chennai on **Daily Evening Walking Footfall**, **Footfall Conversion (0.7% – 1.0%)**, **Monthly Revenue Potential (@ ₹50 avg price)**, **Gross Profit (75% Margin)**, and **Payback Period**.
+    Comprehensive strategic benchmark comparing Chennai's high-footfall bazaars on **Daily Evening Walking Footfall**, **Footfall Conversion (0.7% – 1.0%)**, **Monthly Revenue Potential (@ ₹50 avg price)**, **40% COGS (60% Gross Profit)**, and **Payback Period**.
     """)
 
     m_kpi1, m_kpi2, m_kpi3, m_kpi4 = st.columns(4)
@@ -1007,24 +1033,24 @@ elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
     with m_kpi2:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #38BDF8;">
-            <div class="kpi-title">Flagship Beach Bazaar</div>
-            <div class="kpi-value">₹7.9 L – ₹16.5 L <span style="font-size:0.85rem; color:#94A3B8;">/ Mo</span></div>
-            <div class="kpi-sub"><b>Pondy Bazaar Plaza</b> (525-1,100 cones/day)</div>
+            <div class="kpi-title">North Chennai Powerhouse</div>
+            <div class="kpi-value">₹8.9 L – ₹19.5 L <span style="font-size:0.85rem; color:#94A3B8;">/ Mo</span></div>
+            <div class="kpi-sub"><b>Old Washermanpet MC Road</b> (85k-130k walkers)</div>
         </div>
         """, unsafe_allow_html=True)
     with m_kpi3:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #EC4899;">
-            <div class="kpi-title">Average Converted Cones</div>
-            <div class="kpi-value">350 – 780 <span style="font-size:0.85rem; color:#94A3B8;">Cones / Day</span></div>
-            <div class="kpi-sub">At conservative 0.7% – 1.0% conversion</div>
+            <div class="kpi-title">COGS & Margin Benchmark</div>
+            <div class="kpi-value">40% COGS / 60% GP</div>
+            <div class="kpi-sub">₹20 Raw Cost / ₹30 Profit per cone</div>
         </div>
         """, unsafe_allow_html=True)
     with m_kpi4:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #F59E0B;">
             <div class="kpi-title">Avg Payback Period</div>
-            <div class="kpi-value">3.2 <span style="font-size:0.85rem; color:#94A3B8;">Months</span></div>
+            <div class="kpi-value">3.6 <span style="font-size:0.85rem; color:#94A3B8;">Months</span></div>
             <div class="kpi-sub">Capex recovery at ₹7L kiosk cost</div>
         </div>
         """, unsafe_allow_html=True)
@@ -1044,7 +1070,7 @@ elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
 
     filtered_matrix = [m for m in COMPARATIVE_EVALUATION_MATRIX if matrix_zone_filter == "All Zones" or matrix_zone_filter.lower() in m["zone"].lower()]
 
-    # Compute exact 0.7% - 1.0% conversion revenue for each matrix item
+    # Compute exact 0.7% - 1.0% conversion revenue for each matrix item (40% COGS, 60% Gross Profit)
     matrix_with_insights = []
     for m in filtered_matrix:
         ins = compute_footfall_revenue_insight(m["daily_evening_footfall"], avg_price=50.0)
@@ -1067,7 +1093,7 @@ elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
             "Daily Footfall": m["daily_evening_footfall"],
             "Cones / Day (0.7%-1.0%)": m["ins"]["daily_cones_range"],
             "Monthly Revenue (@ ₹50, 0.7%-1.0%)": m["ins"]["monthly_rev_range"],
-            "Monthly Gross Profit (75%)": m["ins"]["monthly_gp_range"],
+            "Gross Profit @ 60% (40% COGS)": m["ins"]["monthly_gp_range"],
             "Softie Price Range": m["target_price"],
             "Rent / sq.ft": m["rental_sqft_estimate"],
             "Payback Period": m["payback_period_months"],
@@ -1084,7 +1110,7 @@ elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
     st.download_button(
         label="📥 Export Comparative Matrix (.CSV)",
         data=csv_buf.getvalue(),
-        file_name="Chennai_20_Bazaars_Comparative_Evaluation_Matrix.csv",
+        file_name="Chennai_Bazaars_Comparative_Evaluation_Matrix.csv",
         mime="text/csv"
     )
 
@@ -1102,13 +1128,13 @@ elif st.session_state["active_tab"] == "📊 Comparative Evaluation Matrix":
 
 
 # ==============================================================================
-# TAB 3: 20 TOP BAZAAR SITES & PRODUCT-MARKET FIT
+# TAB 3: TOP 20 BAZAAR SITES & GATHERING HOTSPOTS
 # ==============================================================================
-elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Market Fit":
-    st.subheader("🛍️ Chennai's Top 20 High-Footfall Bazaars & Evening Walking Promenades")
+elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Gathering Hotspots":
+    st.subheader("🛍️ Chennai's Top High-Footfall Bazaars & Consumer Gathering Hotspots")
     st.markdown("""
-    These 20 curated retail bazaars, pedestrian shopping corridors, beachfront promenades, and evening food trail districts are selected because **the crowd is already walking outdoors with high dessert purchase intent**.
-    In these micro-markets, traditional scoop parlours struggle with 20-minute queues, high scoop prices, and sticky melting mess. A modern 15-second "Softie" pure milk kiosk with ₹20 entry price and ₹90 max sundae satisfies instant walk-by demand.
+    These curated retail bazaars, pedestrian apparel corridors, beachfront promenades, and evening food trail districts are selected because **crowds gather here on foot for shopping and business**.
+    Each bazaar details the **Exact Consumer Gathering Hotspot (where crowds cluster, pause, and wait)** so you know precisely where to position a Softie kiosk.
     """)
 
     b_kpi1, b_kpi2, b_kpi3 = st.columns(3)
@@ -1116,8 +1142,8 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #38BDF8;">
             <div class="kpi-title">Total Evening Pedestrian Footfall</div>
-            <div class="kpi-value">1,150,000+ <span style="font-size:1rem; color:#94A3B8;">Walkers / Day</span></div>
-            <div class="kpi-sub">Across all 20 curated bazaar corridors</div>
+            <div class="kpi-value">1,250,000+ <span style="font-size:1rem; color:#94A3B8;">Walkers / Day</span></div>
+            <div class="kpi-sub">Across all curated major bazaar corridors</div>
         </div>
         """, unsafe_allow_html=True)
     with b_kpi2:
@@ -1125,15 +1151,15 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
         <div class="kpi-card" style="border-left-color: #10B981;">
             <div class="kpi-title">Conversion Sweet Spot</div>
             <div class="kpi-value">0.7% – 1.0% <span style="font-size:1rem; color:#94A3B8;">of Footfall</span></div>
-            <div class="kpi-sub">At ₹50 average ticket = ₹4.5L - ₹19.5L / month</div>
+            <div class="kpi-sub">At ₹50 avg ticket (40% COGS) = ₹4.5L - ₹19.5L / mo</div>
         </div>
         """, unsafe_allow_html=True)
     with b_kpi3:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #EC4899;">
             <div class="kpi-title">Average Monthly Sales Potential</div>
-            <div class="kpi-value">22,000 <span style="font-size:1rem; color:#94A3B8;">Cones / Mo</span></div>
-            <div class="kpi-sub">15-sec gravity-fed dispensing throughput</div>
+            <div class="kpi-value">24,000 <span style="font-size:1rem; color:#94A3B8;">Cones / Mo</span></div>
+            <div class="kpi-sub">12-sec gravity-fed dispensing throughput</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1144,7 +1170,7 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
         bazaar_zones = ["All Zones", "Central Chennai", "South Chennai", "West Chennai", "North Chennai"]
         chosen_bazaar_zone = st.selectbox("Filter Bazaars by Zone", bazaar_zones)
     with col_search_bazaar:
-        bazaar_search_query = st.text_input("🔍 Search Bazaar, Street, or Landmark (e.g. 'Pondy', 'Beach', 'Sowcarpet', 'KNK')", "")
+        bazaar_search_query = st.text_input("🔍 Search Bazaar, Street, or Hotspot (e.g. 'Washermanpet', 'Pondy', 'Sowcarpet', 'Beach')", "")
 
     filtered_bazaars = []
     for bz in TOP_20_BAZAAR_SITES:
@@ -1152,65 +1178,76 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
             continue
         if bazaar_search_query:
             q = bazaar_search_query.lower()
-            if q not in bz["name"].lower() and q not in bz["landmark"].lower() and q not in bz["exact_stretch"].lower() and q not in bz["bazaar_type"].lower():
+            matches_q = (
+                q in bz["name"].lower() or 
+                q in bz["landmark"].lower() or 
+                q in bz.get("exact_gathering_hotspot", "").lower() or 
+                q in bz["exact_stretch"].lower() or 
+                q in bz["bazaar_type"].lower()
+            )
+            if not matches_q:
                 continue
         filtered_bazaars.append(bz)
 
-    st.caption(f"Showing **{len(filtered_bazaars)}** high-traffic bazaar launch locations.")
+    st.caption(f"Showing **{len(filtered_bazaars)}** high-traffic retail gathering locations.")
 
     for bz in filtered_bazaars:
         bz_insight = compute_footfall_revenue_insight(bz["daily_evening_footfall"], avg_price=50.0)
+        hotspot_text = bz.get("exact_gathering_hotspot", bz.get("landmark", ""))
+        
+        # Render clean HTML card with NO indentation or HTML comments
         render_html(f"""
-        <div class="bazaar-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                <div>
-                    <b style="font-size: 19px; color: #F8FAFC;">#{bz['rank']} {bz['name']}</b>
-                    <span class="bazaar-badge" style="margin-left: 8px;">{bz['zone']}</span>
-                </div>
-                <div style="font-size: 13px; color: #38BDF8; font-weight: 600;">
-                    🚶 Daily Footfall: {bz['daily_evening_footfall']}
-                </div>
-            </div>
-            <div style="margin-top: 6px; font-size: 14px; color: #CBD5E1;">
-                <b>Vibe & Typology:</b> <span style="color: #FCD34D;">{bz['bazaar_type']}</span>
-            </div>
-            <div style="font-size: 13px; color: #94A3B8; margin-top: 4px;">
-                📍 <b>Exact Stretch:</b> {bz['exact_stretch']} | <b>Landmark:</b> {bz['landmark']}
-            </div>
-            <div style="font-size: 13px; color: #94A3B8; margin-top: 4px;">
-                ⏰ <b>Peak Walking Hours:</b> {bz['peak_walking_hours']} | 👥 <b>Crowd Profile:</b> {bz['crowd_profile']}
-            </div>
-            <div style="font-size: 13px; color: #F43F5E; margin-top: 4px;">
-                ⚠️ <b>Nearby Competitor Density:</b> {bz['competitor_density']}
-            </div>
-            
-            <!-- REVENUE PROJECTION INSIGHT (₹50 Avg Price & 0.7% - 1.0% Footfall Conversion) -->
-            <div style="background: linear-gradient(135deg, #064E3B, #0F172A); border-left: 4px solid #10B981; padding: 12px 14px; border-radius: 6px; margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                    <div>
-                        <b style="color: #6EE7B7; font-size: 13.5px;">💰 REVENUE PROJECTION (@ ₹50 AVG ICE CREAM & 0.7% – 1.0% FOOTFALL CONVERSION):</b><br/>
-                        <span style="color: #D1FAE5; font-size: 13px;">
-                            Walking Footfall: <b>{bz['daily_evening_footfall']}</b> | Converted Cones: <b style="color: #FBBF24;">{bz_insight['daily_cones_range']}</b>
-                        </span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span style="font-size: 15px; color: #FFFFFF;">Est. Monthly Revenue: <b style="color: #34D399; font-size: 16px;">{bz_insight['monthly_rev_range']} / Month</b></span><br/>
-                        <span style="font-size: 12px; color: #FDE68A;">Gross Profit (75%): <b>{bz_insight['monthly_gp_range']}</b></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="fit-box">
-                <b>🎯 WHY "SOFTIE" PURE MILK FRANCHISE FITS HERE PERFECTLY:</b><br/>
-                {bz['why_softy_fits_perfectly']}
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 10px; background-color: #0F172A; padding: 8px 12px; border-radius: 6px; font-size: 13px;">
-                <div>🍦 <b>Hero Flavors:</b> <span style="color: #F472B6;">{bz['recommended_hero_flavors']}</span></div>
-                <div>💰 <b>Target Price:</b> <span style="color: #34D399; font-weight: 700;">{bz['target_price_point']}</span> (Core ₹20, Max ₹90)</div>
-                <div>📦 <b>Est. Monthly Volume:</b> <b style="color: #60A5FA;">{bz['estimated_monthly_cones']}</b></div>
-            </div>
-        </div>
-        """)
+<div class="bazaar-card">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+<div>
+<b style="font-size: 19px; color: #F8FAFC;">#{bz['rank']} {bz['name']}</b>
+<span class="bazaar-badge" style="margin-left: 8px;">{bz['zone']}</span>
+</div>
+<div style="font-size: 13px; color: #38BDF8; font-weight: 600;">
+🚶 Daily Footfall: {bz['daily_evening_footfall']}
+</div>
+</div>
+<div style="margin-top: 6px; font-size: 14px; color: #CBD5E1;">
+<b>Vibe & Typology:</b> <span style="color: #FCD34D;">{bz['bazaar_type']}</span>
+</div>
+<div class="hotspot-box">
+<b>📍 EXACT CONSUMER GATHERING HOTSPOT (Where Crowds Cluster & Pause):</b><br/>
+{hotspot_text}
+</div>
+<div style="font-size: 13px; color: #94A3B8; margin-top: 6px;">
+📍 <b>Exact Stretch:</b> {bz['exact_stretch']} | <b>Landmark:</b> {bz['landmark']}
+</div>
+<div style="font-size: 13px; color: #94A3B8; margin-top: 4px;">
+⏰ <b>Peak Walking Hours:</b> {bz['peak_walking_hours']} | 👥 <b>Crowd Profile:</b> {bz['crowd_profile']}
+</div>
+<div style="font-size: 13px; color: #F43F5E; margin-top: 4px;">
+⚠️ <b>Nearby Competitor Density:</b> {bz['competitor_density']}
+</div>
+<div style="background: linear-gradient(135deg, #064E3B, #0F172A); border-left: 4px solid #10B981; padding: 12px 14px; border-radius: 6px; margin-top: 10px;">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+<div>
+<b style="color: #6EE7B7; font-size: 13.5px;">💰 REVENUE PROJECTION (@ ₹50 AVG PRICE • 0.7% – 1.0% CONVERSION • 40% COGS):</b><br/>
+<span style="color: #D1FAE5; font-size: 13px;">
+Walking Footfall: <b>{bz['daily_evening_footfall']}</b> | Converted Cones: <b style="color: #FBBF24;">{bz_insight['daily_cones_range']}</b>
+</span>
+</div>
+<div style="text-align: right;">
+<span style="font-size: 15px; color: #FFFFFF;">Est. Monthly Revenue: <b style="color: #34D399; font-size: 16px;">{bz_insight['monthly_rev_range']} / Month</b></span><br/>
+<span style="font-size: 12px; color: #FDE68A;">Gross Profit @ 60% (40% COGS): <b>{bz_insight['monthly_gp_range']}</b></span>
+</div>
+</div>
+</div>
+<div class="fit-box">
+<b>🎯 WHY "SOFTIE" PURE MILK FRANCHISE FITS HERE PERFECTLY:</b><br/>
+{bz['why_softy_fits_perfectly']}
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 10px; background-color: #0F172A; padding: 8px 12px; border-radius: 6px; font-size: 13px;">
+<div>🍦 <b>Hero Flavors:</b> <span style="color: #F472B6;">{bz['recommended_hero_flavors']}</span></div>
+<div>💰 <b>Target Price:</b> <span style="color: #34D399; font-weight: 700;">{bz['target_price_point']}</span> (Core ₹20, Max ₹90)</div>
+<div>📦 <b>Est. Monthly Volume:</b> <b style="color: #60A5FA;">{bz['estimated_monthly_cones']}</b></div>
+</div>
+</div>
+""")
 
     # Bottom Quick Nav
     st.markdown("---")
@@ -1226,13 +1263,13 @@ elif st.session_state["active_tab"] == "🛍️ Top 20 Bazaar Sites & Product-Ma
 
 
 # ==============================================================================
-# TAB 4: DEDICATED SOFTY SPECIALISTS IN CHENNAI
+# TAB 4: DEDICATED SOFTY SPECIALISTS IN CHENNAI (WITH MAP LINKS)
 # ==============================================================================
 elif st.session_state["active_tab"] == "⚡ Dedicated Softy Specialists in Chennai":
     st.subheader("⚡ Chennai Dedicated Softy (Soft-Serve) Specialists & Competitive Audit")
     st.markdown("""
-    Detailed breakdown of Chennai's 12 prominent dedicated softy specialists, heritage dairy counters, and fast-food soft-serve swirl kiosks.
-    Inspect their pricing, dispensing speeds, signature softies, dairy base quality, customer complaints, and **how "Softie" Pure Milk Franchise beats them**.
+    Detailed breakdown of Chennai's prominent dedicated softy specialists, heritage dairy counters, and fast-food soft-serve swirl kiosks.
+    Inspect their pricing, dispensing speeds, signature softies, dairy base quality, customer complaints, and **clickable Google Maps links for street-view verification**.
     """)
 
     s_kpi1, s_kpi2, s_kpi3 = st.columns(3)
@@ -1263,39 +1300,77 @@ elif st.session_state["active_tab"] == "⚡ Dedicated Softy Specialists in Chenn
 
     st.markdown("<br>", unsafe_allow_html=True)
 
+    # Interactive Table of Softy Specialists with Clickable Google Maps Links
+    df_softy_spec = []
     for s in TOP_SOFTY_SPECIALISTS:
+        s_map_url = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(s['name'] + ' ' + s['address'])}"
+        df_softy_spec.append({
+            "Rank": f"#{s['rank']}",
+            "Specialist Name": s["name"],
+            "Format / Type": s["softy_type"],
+            "Price": s["price_per_cone"],
+            "Rating": f"{s['rating']} ★ ({s['user_ratings_total']:,})",
+            "Speed": s["dispense_speed"],
+            "Dairy Base": s["dairy_base"],
+            "Signature Softy": s["signature_softy"],
+            "Address & Landmark": f"{s['address']} (Near {s['landmark']})",
+            "Google Maps Link": s_map_url
+        })
+
+    st.markdown("#### 📋 Softy Specialists Directory Table")
+    st.dataframe(
+        pd.DataFrame(df_softy_spec),
+        column_config={
+            "Google Maps Link": st.column_config.LinkColumn(
+                "Google Maps Link",
+                help="Click to open this softy specialist in Google Maps in a new tab",
+                display_text="📍 View on Google Maps"
+            )
+        },
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Cards View with Clickable Google Maps Buttons
+    for s in TOP_SOFTY_SPECIALISTS:
+        s_map_url = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(s['name'] + ' ' + s['address'])}"
         render_html(f"""
-        <div class="bazaar-card" style="border-color: #F59E0B;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                <div>
-                    <b style="font-size: 18px; color: #F8FAFC;">#{s['rank']} {s['name']}</b>
-                    <span class="bazaar-badge" style="background-color: #78350F; color: #FDE68A; margin-left: 8px;">{s['softy_type']}</span>
-                </div>
-                <div style="font-size: 14px;">
-                    <span style="color: #F59E0B; font-weight: 700;">{s['rating']} ★</span>
-                    <span style="color: #94A3B8;">({s['user_ratings_total']:,} reviews)</span>
-                </div>
-            </div>
-            <div style="font-size: 13px; color: #94A3B8; margin-top: 4px;">
-                📍 <b>Address:</b> {s['address']} | <b>Landmark:</b> {s['landmark']}
-            </div>
-            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 6px; font-size: 13px; color: #CBD5E1;">
-                <div>🍦 <b>Signature:</b> <span style="color: #FBBF24; font-weight: 600;">{s['signature_softy']}</span></div>
-                <div>💰 <b>Price:</b> <span style="color: #34D399; font-weight: 700;">{s['price_per_cone']}</span></div>
-                <div>🥛 <b>Dairy Base:</b> <span>{s['dairy_base']}</span></div>
-                <div>⚡ <b>Speed:</b> <span style="color: #38BDF8; font-weight: 700;">{s['dispense_speed']}</span></div>
-            </div>
-            <div class="like-box" style="margin-top: 8px;">
-                <b>✅ WHY CUSTOMERS LIKE IT:</b> {s['why_customers_like_it']}
-            </div>
-            <div class="dislike-box" style="margin-top: 6px;">
-                <b>❌ WHAT CUSTOMERS DISLIKE / COMPLAINTS:</b> {s['what_customers_dislike']}
-            </div>
-            <div class="fit-box" style="margin-top: 6px;">
-                <b>🎯 HOW "SOFTIE" PURE MILK DISRUPTS THEM:</b> {s['disruption_angle']}
-            </div>
-        </div>
-        """)
+<div class="bazaar-card" style="border-color: #F59E0B;">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+<div>
+<b style="font-size: 18px; color: #F8FAFC;">#{s['rank']} {s['name']}</b>
+<span class="bazaar-badge" style="background-color: #78350F; color: #FDE68A; margin-left: 8px;">{s['softy_type']}</span>
+</div>
+<div style="font-size: 14px;">
+<span style="color: #F59E0B; font-weight: 700;">{s['rating']} ★</span>
+<span style="color: #94A3B8;">({s['user_ratings_total']:,} reviews)</span>
+</div>
+</div>
+<div style="font-size: 13px; color: #94A3B8; margin-top: 4px;">
+📍 <b>Address:</b> {s['address']} | <b>Landmark:</b> {s['landmark']}
+</div>
+<div style="margin-top: 8px;">
+<a href="{s_map_url}" target="_blank" class="map-btn-link">📍 View on Google Maps (Directions & Street View)</a>
+</div>
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 8px; font-size: 13px; color: #CBD5E1;">
+<div>🍦 <b>Signature:</b> <span style="color: #FBBF24; font-weight: 600;">{s['signature_softy']}</span></div>
+<div>💰 <b>Price:</b> <span style="color: #34D399; font-weight: 700;">{s['price_per_cone']}</span></div>
+<div>🥛 <b>Dairy Base:</b> <span>{s['dairy_base']}</span></div>
+<div>⚡ <b>Speed:</b> <span style="color: #38BDF8; font-weight: 700;">{s['dispense_speed']}</span></div>
+</div>
+<div class="like-box" style="margin-top: 8px;">
+<b>✅ WHY CUSTOMERS LIKE IT:</b> {s['why_customers_like_it']}
+</div>
+<div class="dislike-box" style="margin-top: 6px;">
+<b>❌ WHAT CUSTOMERS DISLIKE / COMPLAINTS:</b> {s['what_customers_dislike']}
+</div>
+<div class="fit-box" style="margin-top: 6px;">
+<b>🎯 HOW "SOFTIE" PURE MILK DISRUPTS THEM:</b> {s['disruption_angle']}
+</div>
+</div>
+""")
 
     # Bottom Quick Nav
     st.markdown("---")
@@ -1319,37 +1394,37 @@ elif st.session_state["active_tab"] == "🍨 All Ice Cream Parlours Directory (T
     else:
         for p in parlors_sorted_by_reviews:
             render_html(f"""
-            <div class="ice-cream-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                    <div>
-                        <b style="font-size: 17px; color: #F8FAFC;">#{p['rank']} {p['name']}</b>
-                        <span style="margin-left: 8px; background-color: #0F172A; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #EC4899; font-weight: 700;">
-                            {p['zone']}
-                        </span>
-                    </div>
-                    <div style="font-size: 14px;">
-                        <span style="color: #F59E0B; font-weight: 700;">{p['rating']} ★</span>
-                        <span style="color: #94A3B8;">({p['user_ratings_total']:,} reviews)</span> | 
-                        <b style="color: #38BDF8;">{p['distance_km']} km away</b> ({p['ring']})
-                    </div>
-                </div>
-                <div style="font-size: 13px; color: #94A3B8; margin-top: 4px;">
-                    📍 <b>Address:</b> {p['address']} | <b>Landmark:</b> {p['landmark']} | <b>Avg Cost for Two:</b> {p['avg_cost_for_two']}
-                </div>
-                <div style="margin-top: 8px;">
-                    <a href="{p['gmaps_url']}" target="_blank" class="map-btn-link">📍 View on Google Maps</a>
-                </div>
-                <div class="like-box">
-                    <b>✅ WHY CUSTOMERS LIKE IT:</b> {p['why_customers_like_it']}
-                </div>
-                <div class="dislike-box">
-                    <b>❌ WHAT CUSTOMERS DISLIKE / COMPLAINTS:</b> {p['what_customers_dislike']}
-                </div>
-                <div class="softy-box">
-                    <b>💡 HOW "SOFTIE" PURE MILK WINS:</b> {p['softy_opportunity']}
-                </div>
-            </div>
-            """)
+<div class="ice-cream-card">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+<div>
+<b style="font-size: 17px; color: #F8FAFC;">#{p['rank']} {p['name']}</b>
+<span style="margin-left: 8px; background-color: #0F172A; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #EC4899; font-weight: 700;">
+{p['zone']}
+</span>
+</div>
+<div style="font-size: 14px;">
+<span style="color: #F59E0B; font-weight: 700;">{p['rating']} ★</span>
+<span style="color: #94A3B8;">({p['user_ratings_total']:,} reviews)</span> | 
+<b style="color: #38BDF8;">{p['distance_km']} km away</b> ({p['ring']})
+</div>
+</div>
+<div style="font-size: 13px; color: #94A3B8; margin-top: 4px;">
+📍 <b>Address:</b> {p['address']} | <b>Landmark:</b> {p['landmark']} | <b>Avg Cost for Two:</b> {p['avg_cost_for_two']}
+</div>
+<div style="margin-top: 8px;">
+<a href="{p['gmaps_url']}" target="_blank" class="map-btn-link">📍 View on Google Maps</a>
+</div>
+<div class="like-box">
+<b>✅ WHY CUSTOMERS LIKE IT:</b> {p['why_customers_like_it']}
+</div>
+<div class="dislike-box">
+<b>❌ WHAT CUSTOMERS DISLIKE / COMPLAINTS:</b> {p['what_customers_dislike']}
+</div>
+<div class="softy-box">
+<b>💡 HOW "SOFTIE" PURE MILK WINS:</b> {p['softy_opportunity']}
+</div>
+</div>
+""")
 
     # Bottom Quick Nav
     st.markdown("---")
@@ -1359,59 +1434,7 @@ elif st.session_state["active_tab"] == "🍨 All Ice Cream Parlours Directory (T
 
 
 # ==============================================================================
-# TAB 6: WHAT CUSTOMERS LIKE VS COMPLAINTS
-# ==============================================================================
-elif st.session_state["active_tab"] == "💬 What Customers Like vs Complaints":
-    st.subheader("💬 Customer Psychology: Why Chennai Loves Certain Parlours vs What They Hate")
-    st.caption("Extracted from over 250,000+ customer reviews across Chennai's top 50 ice cream parlours.")
-
-    col_like_theme, col_dislike_theme = st.columns(2)
-
-    with col_like_theme:
-        st.markdown("#### ✅ Top 5 Things Customers LOVE")
-        st.markdown("""
-        1. **Pure Dairy Creaminess & Real Milk (92% Positive Sentiment)**
-           - *Why:* Customers hate artificial icy premixes and oily vegetable fats. Naturals and Amadora win because customers feel rich dairy milk.
-           - *"Softie" Advantage:* **100% Pure Fresh Milk Base** provides rich velvety mouthfeel with zero oily aftertaste.
-        2. **Late-Night Post-Dinner Dessert Strolls (88% Positive)**
-           - *Why:* Chennai families and young couples specifically venture out after 9:30 PM dinner for a cold sweet treat. Parlours open till 12:30 AM capture 45% of daily revenue in those 3 hours.
-        3. **Warm-and-Cold Dessert Combinations (81% Positive)**
-           - *Why:* Sizzling brownies with cold softy and Belgian chocolate dips trigger dopamine and drive repeat orders.
-        4. **Aesthetic Instagram Presentation (76% Positive)**
-           - *Why:* Clean golden swirls, Belgian choco shell dip, and waffle cones make customers share photos on social media.
-        5. **Instant Grab-and-Go Portability (71% Positive)**
-           - *Why:* Customers walking on Besant Nagar beach or Pondy Bazaar want an instant cone in hand to enjoy while walking.
-        """)
-
-    with col_dislike_theme:
-        st.markdown("#### ❌ Top 5 Things Customers HATE & COMPLAIN ABOUT")
-        st.markdown("""
-        1. **Weighing Scale Pricing Traps & Exorbitant Bills (84% Negative)**
-           - *Complaint:* Customers walk into Ibaco or Cream Stone expecting to spend ₹150 and walk out shocked with a ₹550 bill.
-           - *"Softie" Play:* **Fixed Flat Pricing:** ₹20 core cone, ₹35-₹60 swirls, and ₹90 max gourmet sundae!
-        2. **15 to 25 Minute Slow Queues & Cold Stone Delays (79% Negative)**
-           - *Complaint:* Mixing on cold stone is slow; by the time the second cone is prepared, the first is already melting.
-           - *"Softie" Play:* **Instant 15-Second Dispense:** Gravity-fed levers dispense in 5 seconds flat!
-        3. **Rapid Melting in Chennai's 34°C Humidity (74% Negative)**
-           - *Complaint:* Heavy gelatos melt into sticky soup dripping over hands within 3 minutes outdoors.
-           - *"Softie" Play:* **Waffle Cup & Anti-Drip Collar:** Pure milk butterfat formula that holds structure.
-        4. **Parking Tow-Aways & Traffic Fines (68% Negative)**
-           - *Complaint:* No car parking on Usman Road, KNK Road, or 2nd Avenue Anna Nagar; traffic police issue fines.
-           - *"Softie" Play:* **Pedestrian Footfall Plazas:** Position on walking corridors where customers are already walking.
-        5. **Heavy Sickly Sugar Overload (58% Negative)**
-           - *Complaint:* Heavy scoop ice creams leave customers feeling bloated and thirsty.
-           - *"Softie" Play:* **Light, Velvety Texture:** Higher overrun and balanced natural milk sweetness.
-        """)
-
-    # Bottom Quick Nav
-    st.markdown("---")
-    if st.button("🗺️ ← Back to Catchment Map & Table", key="likes_to_map"):
-        st.session_state["active_tab"] = "🗺️ Interactive Catchment Map & Outlets Directory"
-        st.rerun()
-
-
-# ==============================================================================
-# TAB 7: FEEDER ROAD TRAFFIC & COMMUTERS
+# TAB 6: FEEDER ROAD TRAFFIC & COMMUTERS
 # ==============================================================================
 elif st.session_state["active_tab"] == "🚦 Feeder Road Traffic & Commuters":
     st.subheader(f"Traffic Volume & Floating Footfall for Roads Feeding {focal_label}")
@@ -1455,13 +1478,13 @@ elif st.session_state["active_tab"] == "🚦 Feeder Road Traffic & Commuters":
 
 
 # ==============================================================================
-# TAB 8: "SOFTIE" FRANCHISE BLUEPRINT & FINANCIAL MODEL
+# TAB 7: "SOFTIE" FRANCHISE BLUEPRINT & FINANCIAL MODEL (40% COGS / 60% GP)
 # ==============================================================================
 elif st.session_state["active_tab"] == "🚀 'Softie' Franchise Blueprint & Financial Model":
     st.subheader("🚀 'Softie' Franchise Launch Blueprint & Financial Model")
     st.markdown("""
     Complete operational playbook and unit economics for scaling the **"Softie"** pure milk franchise brand across Chennai.
-    Based on **₹20 core entry rate**, **₹90 maximum cost ice cream**, **100% pure dairy milk quality**, and an average sales target of **₹15,000 / day** per kiosk.
+    Based on **₹20 core entry rate**, **₹90 maximum cost ice cream**, **40% COGS (60% Gross Margin)**, **100% pure dairy milk quality**, and an average sales target of **₹15,000 / day** per kiosk.
     """)
 
     b1, b2, b3, b4 = st.columns(4)
@@ -1476,25 +1499,25 @@ elif st.session_state["active_tab"] == "🚀 'Softie' Franchise Blueprint & Fina
     with b2:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #10B981;">
-            <div class="kpi-title">Core Price Point</div>
-            <div class="kpi-value">₹20 <span style="font-size:0.9rem; color:#94A3B8;">Start</span></div>
-            <div class="kpi-sub">Pure Fresh Milk Softie Cone</div>
+            <div class="kpi-title">COGS & Margin</div>
+            <div class="kpi-value">40% / 60%</div>
+            <div class="kpi-sub">40% COGS (₹20) • 60% Gross Margin (₹30)</div>
         </div>
         """, unsafe_allow_html=True)
     with b3:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #EC4899;">
-            <div class="kpi-title">Maximum Menu Price</div>
-            <div class="kpi-value">₹90 <span style="font-size:0.9rem; color:#94A3B8;">Max</span></div>
-            <div class="kpi-sub">Gourmet Belgian Waffle Sundae</div>
+            <div class="kpi-title">Menu Price Range</div>
+            <div class="kpi-value">₹20 – ₹90</div>
+            <div class="kpi-sub">Pure Fresh Milk Formula</div>
         </div>
         """, unsafe_allow_html=True)
     with b4:
         st.markdown("""
         <div class="kpi-card" style="border-left-color: #F59E0B;">
-            <div class="kpi-title">Net Profit Margin</div>
-            <div class="kpi-value">46.1% <span style="font-size:0.9rem; color:#94A3B8;">Net</span></div>
-            <div class="kpi-sub">₹2,07,500 / Month Net Profit</div>
+            <div class="kpi-title">Monthly Net Profit</div>
+            <div class="kpi-value">₹1,45,000 <span style="font-size:0.9rem; color:#94A3B8;">/ Mo</span></div>
+            <div class="kpi-sub">32.2% Net Margin after all expenses</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1502,36 +1525,36 @@ elif st.session_state["active_tab"] == "🚀 'Softie' Franchise Blueprint & Fina
 
     # Footfall Conversion Model Highlight
     render_html("""
-    <div style="background: linear-gradient(135deg, #064E3B, #0F172A); border: 2px solid #10B981; border-radius: 10px; padding: 18px; margin-bottom: 20px;">
-        <h4 style="color: #6EE7B7; margin-top: 0;">🎯 The 0.7% – 1.0% Footfall Conversion Model (@ ₹50 Average Ice Cream)</h4>
-        <p style="color: #CBD5E1; font-size: 14px;">
-            In high-density retail bazaars and beach promenades, you do not need 5% or 10% market share to build a wildly profitable franchise.
-            Capturing just <b>7 to 10 customers out of every 1,000 pedestrians walking past your kiosk</b> (0.7% - 1.0% conversion) at an impulse ₹50 price point generates:
-        </p>
-        <ul style="color: #F8FAFC; font-size: 14px;">
-            <li><b>Flagship Bazaars (75k - 110k footfall like Pondy Bazaar / Usman Rd):</b> 525 - 1,100 cones/day → <b>₹7.88 Lakhs – ₹16.50 Lakhs / Month Revenue</b></li>
-            <li><b>Beach Promenades (40k - 65k footfall like Besant Nagar Beach):</b> 280 - 650 cones/day → <b>₹4.20 Lakhs – ₹9.75 Lakhs / Month Revenue</b></li>
-            <li><b>Suburban Commercial Belts (45k - 70k footfall like Velachery / Tambaram):</b> 315 - 700 cones/day → <b>₹4.73 Lakhs – ₹10.50 Lakhs / Month Revenue</b></li>
-        </ul>
-        <p style="color: #FCD34D; font-size: 13.5px; font-weight: 600; margin-bottom: 0;">
-            Even at the conservative lower bound of 0.7% conversion, a kiosk in any of Chennai's top 15 bazaars comfortably meets or exceeds your baseline goal of ₹15,000 / day (₹4,50,000 / month)!
-        </p>
-    </div>
-    """)
+<div style="background: linear-gradient(135deg, #064E3B, #0F172A); border: 2px solid #10B981; border-radius: 10px; padding: 18px; margin-bottom: 20px;">
+<h4 style="color: #6EE7B7; margin-top: 0;">🎯 The 0.7% – 1.0% Footfall Conversion Model (@ ₹50 Average Ice Cream & 40% COGS)</h4>
+<p style="color: #CBD5E1; font-size: 14px;">
+In high-density retail bazaars and beach promenades, you do not need 5% or 10% market share to build a wildly profitable franchise.
+Capturing just <b>7 to 10 customers out of every 1,000 pedestrians walking past your kiosk</b> (0.7% - 1.0% conversion) at an impulse ₹50 price point with 40% COGS generates:
+</p>
+<ul style="color: #F8FAFC; font-size: 14px;">
+<li><b>Flagship Bazaars (75k - 130k footfall like Pondy Bazaar, Usman Rd, Washermanpet MC Rd):</b> 525 - 1,300 cones/day → <b>₹7.88 Lakhs – ₹19.50 Lakhs / Month Revenue</b> (Gross Profit @ 60%: <b>₹4.73 L – ₹11.70 L / Mo</b>)</li>
+<li><b>Beach Promenades (40k - 65k footfall like Besant Nagar Beach):</b> 280 - 650 cones/day → <b>₹4.20 Lakhs – ₹9.75 Lakhs / Month Revenue</b> (Gross Profit: <b>₹2.52 L – ₹5.85 L / Mo</b>)</li>
+<li><b>Suburban Commercial Belts (45k - 70k footfall like Velachery / Tambaram):</b> 315 - 700 cones/day → <b>₹4.73 Lakhs – ₹10.50 Lakhs / Month Revenue</b> (Gross Profit: <b>₹2.84 L – ₹6.30 L / Mo</b>)</li>
+</ul>
+<p style="color: #FCD34D; font-size: 13.5px; font-weight: 600; margin-bottom: 0;">
+Even at the conservative lower bound of 0.7% conversion, a kiosk in any of Chennai's top bazaars comfortably meets or exceeds your baseline goal of ₹15,000 / day (₹4,50,000 / month)!
+</p>
+</div>
+""")
 
     col_bp1, col_bp2 = st.columns(2)
 
     with col_bp1:
-        st.markdown("### 📋 Complete 'Softie' Menu & Margin Architecture")
+        st.markdown("### 📋 Complete 'Softie' Menu & Margin Architecture (40% COGS)")
         st.markdown("""
-        | Menu Item | Customer Price | Pure Milk COGS | Gross Margin | Daily Target Mix |
+        | Menu Item | Customer Price | Pure Milk COGS (40%) | Gross Margin (60%) | Daily Target Mix |
         | :--- | :--- | :--- | :--- | :--- |
-        | **Pure Milk Softie Cone (Core Rate)** | **₹20** | ₹5.50 (Fresh Milk + Cone) | **72.5%** | 160 cones (₹3,200) |
-        | **Classic Double Swirl (Milk + Cocoa/Mango)** | **₹35** | ₹8.50 (Pure Milk + Cocoa) | **75.7%** | 110 cones (₹3,850) |
-        | **Hard Shell Chocolate Crunch Dip Cone** | **₹50** | ₹12.00 (Milk + Warm Dip) | **76.0%** | 65 cones (₹3,250) |
-        | **Real Fruit / Brownie Fudge Sundae Cup** | **₹70** | ₹16.50 (Softy + Brownie) | **76.4%** | 40 cups (₹2,800) |
-        | **Maximum Cost: Belgian Waffle Sundae Cone** | **₹90** | ₹21.00 (Waffle + Toppings) | **76.7%** | 22 cones (₹1,980) |
-        | **TOTALS / BLENDED AVERAGE** | **~₹38.5 Blended** | **~₹9.90 Avg COGS** | **~74.3% Gross** | **~397 Cones = ₹15,080 / Day** |
+        | **Pure Milk Softie Cone (Core Rate)** | **₹20** | ₹8.00 (Fresh Milk + Crisp Cone) | **60.0% (₹12.00)** | 120 cones (₹2,400) |
+        | **Classic Double Swirl (Milk + Cocoa/Mango)** | **₹35** | ₹14.00 (Pure Milk + Cocoa) | **60.0% (₹21.00)** | 90 cones (₹3,150) |
+        | **Hard Shell Chocolate Crunch Dip Cone** | **₹50** | ₹20.00 (Milk + Warm Dip) | **60.0% (₹30.00)** | 70 cones (₹3,500) |
+        | **Real Fruit / Brownie Fudge Sundae Cup** | **₹70** | ₹28.00 (Softy + Brownie) | **60.0% (₹42.00)** | 45 cups (₹3,150) |
+        | **Maximum Cost: Belgian Waffle Sundae Cone** | **₹90** | ₹36.00 (Waffle + Toppings) | **60.0% (₹54.00)** | 31 cones (₹2,800) |
+        | **TOTALS / BLENDED AVERAGE** | **~₹42.8 Blended** | **~₹17.10 Avg COGS (40%)** | **60.0% Gross Margin** | **~356 Cones = ₹15,000 / Day** |
         """)
 
         st.markdown("### 🥛 The Pure Milk Advantage vs Competitors")
@@ -1548,14 +1571,14 @@ elif st.session_state["active_tab"] == "🚀 'Softie' Franchise Blueprint & Fina
         | Line Item | Daily Amount | Monthly Total (30 Days) | % of Revenue |
         | :--- | :--- | :--- | :--- |
         | **Gross Revenue** | **₹15,000** | **₹4,50,000** | **100.0%** |
-        | Raw Material COGS (Milk, Cones, Sauces) | ₹3,750 | ₹1,12,500 | 25.0% |
-        | **Gross Profit (75.0%)** | **₹11,250** | **₹3,37,500** | **75.0%** |
+        | Raw Material COGS (Milk, Cones, Sauces @ 40%) | ₹6,000 | ₹1,80,000 | 40.0% |
+        | **Gross Profit (60.0%)** | **₹9,000** | **₹2,70,000** | **60.0%** |
         | Commercial Kiosk Rent (80-120 sq.ft) | — | ₹65,000 | 14.4% |
         | Staff Salaries (2 Shift Operators @ ₹16k) | — | ₹32,000 | 7.1% |
         | Commercial Electricity & Deep Freeze Power | — | ₹18,000 | 4.0% |
-        | Packaging, Drip Sleeves & Franchise Tech | — | ₹15,000 | 3.3% |
-        | **Total Operating Expenses (OpEx)** | — | **₹1,30,000** | **28.9%** |
-        | **NET PROFIT TO FRANCHISEE** | **₹6,916 / day** | **₹2,07,500 / month** | **46.1% Net** |
+        | Packaging, Drip Sleeves & Consumables | — | ₹10,000 | 2.2% |
+        | **Total Operating Expenses (OpEx)** | — | **₹1,25,000** | **27.8%** |
+        | **NET PROFIT TO FRANCHISEE** | **₹4,833 / day** | **₹1,45,000 / month** | **32.2% Net** |
         """)
 
         st.markdown("### ⚡ Kiosk Setup Capex & Payback Period")
@@ -1567,17 +1590,17 @@ elif st.session_state["active_tab"] == "🚀 'Softie' Franchise Blueprint & Fina
         - **POS Terminal, Printer & QR Soundbox:** ₹25,000
         - **Initial Milk & Packaging Inventory:** ₹30,000
         - **Total Franchise Setup Capex:** **₹6,55,000 - ₹7,55,000**
-        - **Capital Payback Period:** **3.2 to 3.8 Months!**
+        - **Capital Payback Period:** **4.5 to 5.2 Months!**
         """)
 
     st.markdown("---")
     st.markdown("### 🏆 Top 5 Flagship Bazaar Locations to Hit & Exceed ₹15,000 / Day:")
     st.markdown("""
-    1. **Besant Nagar Beach Promenade (Elliot's Beach):** 40,000+ evening strollers. Projected revenue: **₹4.20 L – ₹9.75 L / month** (at ₹50 avg & 0.7%-1.0% conversion).
+    1. **Old Washermanpet MC Road (Mania Kakkai Street):** 85,000+ bridal shoppers. Projected revenue: **₹8.92 L – ₹19.50 L / month** (at ₹50 avg & 0.7%-1.0% conversion).
     2. **Pondy Bazaar Pedestrian Plaza (T. Nagar):** 75,000+ pedestrian shoppers. Projected revenue: **₹7.88 L – ₹16.50 L / month**.
-    3. **Marina Beach Promenade (Near Light House):** 60,000+ beach visitors. Projected revenue: **₹6.30 L – ₹15.00 L / month**.
-    4. **Anna Nagar 2nd Avenue (Roundtana to Blue Star):** Premium residential dessert strip. Projected revenue: **₹5.25 L – ₹12.00 L / month**.
-    5. **Sowcarpet / Mint Street (Chaat Corridor):** 60,000+ street food shoppers looking for sweet cooling relief. Projected revenue: **₹6.30 L – ₹14.25 L / month**.
+    3. **Besant Nagar Beach Promenade (Elliot's Beach):** 40,000+ evening strollers. Projected revenue: **₹4.20 L – ₹9.75 L / month**.
+    4. **Marina Beach Promenade (Near Light House):** 60,000+ beach visitors. Projected revenue: **₹6.30 L – ₹15.00 L / month**.
+    5. **Anna Nagar 2nd Avenue (Roundtana to Blue Star):** Premium residential dessert strip. Projected revenue: **₹5.25 L – ₹12.00 L / month**.
     """)
 
     # Bottom Quick Nav
@@ -1594,7 +1617,7 @@ elif st.session_state["active_tab"] == "🚀 'Softie' Franchise Blueprint & Fina
 
 
 # ==============================================================================
-# TAB 9: DOWNLOAD MASTER EXCEL
+# TAB 8: DOWNLOAD MASTER EXCEL
 # ==============================================================================
 elif st.session_state["active_tab"] == "📥 Download Master Excel (.xlsx)":
     st.subheader("📥 Download Master 14-Sheet Excel Workbook")
@@ -1604,8 +1627,8 @@ elif st.session_state["active_tab"] == "📥 Download Master Excel (.xlsx)":
     - **`Top_50_Ice_Cream_Parlors`**: All 50 top places with Rating, Review Count, **Why Customers Like It**, **What Customers Dislike / Complaints**, and **"Softie" Opportunities**.
     - **`Why_Customers_Like_Ranked`**: Ranked sensory appeal drivers in Chennai.
     - **`What_Customers_Dislike_Ranked`**: Ranked competitor vulnerabilities & complaints.
-    - **`20_Bazaars_Matrix`**: Comparative Evaluation Matrix for 20 Bazaars with footfall conversion revenue models.
-    - **`Dedicated_Softy_Outlets`**: 12 dedicated softy specialists audit.
+    - **`20_Bazaars_Matrix`**: Comparative Evaluation Matrix for Bazaars with 0.7%-1.0% footfall conversion revenue models (@ 40% COGS).
+    - **`Dedicated_Softy_Outlets`**: Dedicated softy specialists audit.
     - **7 Daily Sheets (`Monday_Top50_Traffic_Roads` to `Sunday_Top50_Traffic_Roads`)**: Top 50 floating streets sorted by time intervals.
     """)
 
